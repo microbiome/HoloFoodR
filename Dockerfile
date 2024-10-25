@@ -18,13 +18,13 @@ RUN Rscript -e 'repos <- BiocManager::repositories(); \
 # RUN Rscript -e 'install.packages(c("DT", "patchwork", "reticulate", "reshape", "shadowtext", "shadowtext", \
 #     "scater", "ggsignif", "stringr", "ggpubr", "GGally", "ggplot2", "knitr", "latex2exp", "UpSetR"))'
 
-RUN Rscript -e 'install.packages(c("dplyr", "DT", "ggpubr", "ggsignif", "latex2exp", "patchwork", "shadowtext", "reticulate"))'
+RUN Rscript -e 'install.packages(c("dplyr", "DT", "ggsignif", "latex2exp", "patchwork", "shadowtext", "reticulate"))'
 
 # Install Bioconductor packages for case study
 RUN R -e 'BiocManager::install(c("BiocStyle", "ComplexHeatmap", "MGnifyR", "mia", "miaViz", "MOFA2", "scater"))'
 
 # Install HoloFoodR locally
-RUN R -e 'devtools::install_local()'
+RUN R -e 'devtools::install_local("/opt/pkg/")'
 
 # Install mofapy2 for case study
 # RUN python3 -m pip install 'https://github.com/bioFAM/mofapy2/tarball/master'
