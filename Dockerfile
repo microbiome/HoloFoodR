@@ -24,7 +24,7 @@ RUN Rscript -e 'install.packages(c("dplyr", "DT", "ggpubr", "ggsignif", "latex2e
 RUN R -e 'BiocManager::install(c("BiocStyle", "ComplexHeatmap", "MGnifyR", "mia", "miaViz", "MOFA2", "scater"))'
 
 # Install HoloFoodR locally
-RUN R -e 'devtools::install_local()'
+RUN R -e 'devtools::install(pkg = "/opt/pkg/", build = TRUE)'
 
 # Install mofapy2 for case study
 # RUN python3 -m pip install 'https://github.com/bioFAM/mofapy2/tarball/master'
