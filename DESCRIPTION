@@ -43,6 +43,7 @@ Suggests:
     reticulate,
     rmarkdown,
     scater,
+    shadowtext,
     testthat,
     UpSetR
 Remotes:

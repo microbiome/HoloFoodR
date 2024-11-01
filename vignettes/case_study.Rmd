@@ -40,9 +40,9 @@ multi-omics, offering a practical example for readers.
 
 Our main study questions are:
 
-    - Do treatment associate with salmons' gut flora?
-    - Do larger salmons have different gut microbiota compared to smaller ones?
-    - Do gut microbiota have association with muscle tissue fatty acids?
+* How does treatment influence the gut microbiota of salmon?
+* Do gut flora and fatty acids composition evolve over time?
+* Is there a relationship between gut microbiota and the fatty acid composition in muscle tissue?
 
 ```{r}
 #| label: start
@@ -63,7 +63,7 @@ knitr::opts_chunk$set(
 # List of packages that we need
 packages <- c(
     "dplyr", "DT", "ggsignif", "HoloFoodR", "MGnifyR", "mia", "miaViz", "MOFA2",
-    "patchwork", "reticulate", "scater"
+    "patchwork", "reticulate", "scater", "shadowtext"
 )
 
 # Load all packages into session. Stop if there are packages that were not
@@ -266,15 +266,16 @@ samples overlap between them.
 
 ```{r}
 #| label: upsetplot
+#| fig-cap: The distribution of experiments in the dataset, along with the number of samples in each experiment.
 
 upset_plot <- upsetSamples(mae)
 upset_plot
 ```
 
 For demonstration purposes, we will focus on investigating fatty acids and
-metagenomic data (`fatty_acids_mg` and `metagenomic_amplicon`) within the trial
-A performed by the HoloFood consortium. This trial the health effects of
-fermented seaweed added to the diet of salmons.
+metagenomic data within the trial A performed by the HoloFood consortium. This
+trial the health effects of fermented seaweed added to the diet of salmons.
+The following script subsets the data to include aforementioned data.
 
 ```{r}
 #| label: preprocess1
@@ -321,49 +322,22 @@ information.
 ```{r}
 #| label: preprocess3
 
-# Add treatment groups
-colData(mae)[["treatment_group"]] <- ifelse(
-  colData(mae)[["Treatment concentration"]]>0, "treatment", "control")
+# Add time points
+timepoints <- colData(mae[[2]])
+timepoints <- timepoints[match(timepoints[["animal"]], rownames(colData(mae))), ]
+timepoints <- ifelse(timepoints[["trial.timepoint"]] == 0, "start", "end")
+timepoints <- factor(timepoints, levels = c("start", "end"))
+colData(mae)[["timepoint"]] <- timepoints
 
-# Add salmon host mass to MAE colData
-colData(mae[[2]])[["host.gutted.mass"]] <- as.numeric(
-    colData(mae[[2]])[["host.gutted.mass"]])
-colData(mae[[2]])[["mass_scaled"]] <- scale(
-  colData(mae[[2]])[["host.gutted.mass"]])
-merged_data <- merge(
-    x = colData(mae),
-    y = colData(mae[[2]])[, c("animal", "host.gutted.mass", "mass_scaled")],
-    all.x = TRUE, by = "animal"
-)
-rownames(merged_data) <- merged_data[["animal"]]
-# Order and add back
-colData(mae) <- merged_data[match(
-    colData(mae)[["animal"]], merged_data[["animal"]]), ]
+# Add treatment groups
+colData(mae)[["study_group"]] <- ifelse(
+  colData(mae)[["Treatment concentration"]]>0, "treatment", "control")
+colData(mae)[colData(mae)[["timepoint"]] == "start" , "study_group"] <- "control"
 
 # Add animal metadata to separate experiments
 mae[[1]] <- getWithColData(mae, 1)
 mae[[2]] <- getWithColData(mae, 2)
 ```
-
-As we want to analyze the effect of treatment, we must analyze
-salmons at day 60 because these salmons were sampled after experimental period.
-In contrast, day-0 salmons that were sampled immediately in the beginning of
-the trial.
-
-We select those samples that are drawn in day 60.
-
-```{r}
-#| label: preprocess4
-
-# Subset by taking only samples from day 60
-samples <- colnames(mae[[2]])[mae[[2]]$trial.timepoint == 60]
-mae[[2]] <- mae[[2]][, samples]
-# Make sure that we have same set of samples from each experiment
-mae <- intersectColumns(mae)
-```
-
-Now the data includes samples that are taken in day 60. Each animal have both
-microbiota data and fatty acid data.
 
 ### Filtering and agglomeration
 
@@ -376,6 +350,7 @@ extremely low-abundant genera.
 
 ```{r}
 #| label: prevalence_histgoram
+#| fig-cap: The prevalence of microbial genera across samples.
 
 # Add relative transforrmed data
 mae[[2]] <- transformAssay(mae[[2]], method = "relabundance")
@@ -392,8 +367,7 @@ prevalence <- getPrevalence(
 # Exclude microbes with 0 prevalence
 prevalence <- prevalence[prevalence != 0]
 
-hist(prevalence, main = "Prevalence of microbial taxa",
-     xlab = "Prevalence")
+hist(prevalence)
 ```
 
 We can also look at the raw prevalence numbers
@@ -447,12 +421,10 @@ histogram of standard deviations of fatty acid abundances.
 
 ```{r}
 #| label: filter_fatty1
+#| fig-cap: The distribution of standard deviations for fatty acid concentrations.
 
 rowData(mae[[1]])[["sd"]] <- rowSds(assay(mae[[1]], "counts"), na.rm = TRUE)
-hist(rowData(mae[[1]])[["sd"]],
-    main = "Standard deviation distribution of fatty acid abundances",
-    xlab = "Standard deviation",
-    breaks = 20)
+hist(rowData(mae[[1]])[["sd"]])
 ```
 
 We apply a filtering threshold of 0.5 to exclude fatty acids that do not
@@ -534,13 +506,14 @@ mae[[1]] <- transformAssay(
 )
 ```
 
-## Fatty acids, mass and treatment
+## Analyzing fatty acids: Time and treatment effects
 
-### Does treatment affect fatty acids?
-
-We aim to investigate whether the treatment is associated with changes in fatty
-acid concentrations. To begin, we assess the correlation between treatment
-levels and the concentrations of specific fatty acids
+We aim to investigate how fatty acids evolve over time and, more importantly,
+whether the feed additive impacts these fatty acids. To achieve this, we will
+fit a simple linear model for each fatty acid, accounting for time and treatment
+effects in a non-parametric manner. These models resemble the Wilcoxon test but
+include additional covariates. This approach will allow us to estimate the
+variability explained by time, treatment, or both factors.
 
 ```{r}
 #| label: fatty_and_treatment
@@ -548,62 +521,41 @@ levels and the concentrations of specific fatty acids
 # Get fatty acids that we are going to test
 tse <- altExp(mae[[1]], "relevant")
 
-# For each fatty acid, test if the groups are different
+# For each fatty acid, fit linear model
 res <- lapply(rownames(tse), function(feat){
-    res <- pairwise.wilcox.test(
-      assay(tse, "counts")[feat, ], tse[["treatment_group"]],
-      p.adjust.method = "none")
+    # Get data of single feature
+    df <- meltSE(tse[feat, ], add.col = TRUE)
+    # Fit model
+    res <- lm(rank(counts) ~ study_group + timepoint, data = df)
+    # Get only p-values
+    res <- summary(res)
+    res <- res[[4]][, 4]
     return(res)
 })
-# Combine results and adjust p -values
+# Combine results and adjust p-values
 res <- do.call(rbind, res) |> as.data.frame()
-res[["p.value"]] <- p.adjust(res[["p.value"]], method = "fdr")
+res <- lapply(res, p.adjust, method = "fdr") |> as.data.frame()
+# Add feature names
+res[["feature"]] <- rownames(tse)
 res |> datatable()
 ```
 
-As observed, the treatment appears to have no significant effect on fatty acid
-concentrations.
-
-### Is there association between salmon size and fatty acids?
-
-Additionally, it is worth exploring whether the size of the
-salmon is associated with variations in fatty acid levels.
+As observed, treatment does not appear to affect fatty acid concentrations
+significantly. In contrast, time seems to influence nearly all fatty acids; as
+salmon grow, certain fatty acid concentrations in their muscle tissue increase.
+This relationship can be further visualized as follows.
 
 ```{r}
-#| label: fatty_and_weight1
-
-# Calculate correlation
-res <- getCrossAssociation(
-    mae, experiment1 = 1, experiment2 = 1, altexp1 = "relevant",
-    assay.type1 = "standardize", col.var2 = "mass_scaled",
-    test.signif = TRUE, method = "pearson"
-)
-res
-```
-
-There appears to be a notable effect: larger salmon seem to have slightly higher
-concentrations of fatty acids. This trend can be further illustrated through
-plots.
-
-```{r}
-#| label: fatty_and_weight2
+#| label: fatty_and_treatment_vis
+#| fig-cap: Concentrations of selected fatty acids at the start and end of the trial, with an indication of whether animals received treatment.
 
 p <- plotExpression(
-    altExp(mae[[1]], "relevant"),
-    features = rownames(altExp(mae[[1]], "relevant")),
-    x = "mass_scaled",
-    assay.type = "standardize",
-    scales = "free"
-    ) +
-  geom_smooth(method = "lm")
+    tse, rownames(tse), assay.type = "counts", x = "timepoint",
+    colour_by = "study_group", scales = "free")
 p
 ```
 
-As a result of this initial analysis of fatty acids, we discovered that the
-size of the salmon appears to have some association with fatty acid
-concentrations, although this association is not statistically significant.
-
-## Microbiota, mass and treatment
+## Analyzing microbiota: Time and treatment effects
 
 ### Microbial composition
 
@@ -612,11 +564,12 @@ composition with relative abundance barplot.
 
 ```{r}
 #| label: abundance_plot
+#| fig-cap: Relative abundance of core microbial genera across samples.
 
 p <- plotAbundance(
     altExp(mae[[2]], "core_genus"),
     assay.type = "relabundance",
-    col.var = "treatment_group",
+    col.var = c("study_group", "timepoint"),
     facet.cols = TRUE, scales = "free_x"
     )
 p
@@ -625,39 +578,55 @@ p
 Salmon gut seems to be dominated by either genus _Mycoplasma_ or
 _Photobacterium_.
 
-### Is alpha diversity associated with treatment or mass of salmon?
+### Association of alpha diversity with treatment and salmon age
 
-Next, let's calculate the Shannon alpha diversity index and
-test whether diversity is associated with both size and treatment.
+Now, let’s proceed to calculate the Shannon alpha diversity index.
 
 ```{r}
 #| label: alpha
 
 # Calculate alpha diversity
 mae[[2]] <- addAlpha(mae[[2]])
-
-# Plot with metadata
-p1 <- plotColData(mae[[2]], x = "mass_scaled", y = "shannon_diversity") +
-  geom_smooth(method = "lm") +
-  ggtitle("Shannon diversity association\nwith body mass") +
-  xlab("Scaled body mass") + ylab("Shannon diversity index")
-p2 <- plotColData(mae[[2]], x = "treatment_group", y = "shannon_diversity") +
-    geom_signif(comparisons = list(c("control", "treatment")), ) +
-  ggtitle("Shannon diversity association\nwith treatment") +
-  xlab("Treatment group") + ylab("Shannon diversity index")
-
-p1 + p2
 ```
 
-Once again, we observe a potential effect, this time between treatment and
-microbial diversity, although it is not statistically significant. Additionally,
-there is no association between diversity and mass.
+With the alpha diversity indices calculated and added to `colData`, we can now
+assess whether time and treatment influence the microbial diversity in the
+salmon gut flora.
+
+```{r}
+#| label: alpha2
+
+# Get sample metadata
+df <- colData(mae[[2]])
+# Fit model to estimate influence of treatment and time to diversity
+res <- lm(rank(shannon_diversity) ~ study_group + timepoint, data = df)
+res <- summary(res)
+res
+```
+
+Based on the results, we conclude that older salmon exhibit distinct microbial
+diversity compared to younger ones. Additionally, there appears to be a
+slight—though not statistically significant—effect of treatment on microbial
+diversity.
+
+```{r}
+#| label: alpha3
+#| fig-cap: Shannon diversity of microbial communities in salmon at the start and end of the trial, with information on treatment status.
+
+p <- plotColData(
+    mae[[2]], x = "timepoint", y = "shannon_diversity",
+    colour_by = "study_group")
+p
+```
+
+### Microbial dissimilarity among samples
 
 Let's analyze whether we can find similar effect with beta diversity. Here we
 perform Principal Coordinate Analysis (PCoA) with Bray-Curtis dissimilarity.
 
 ```{r}
 #| label: pcoa_beta_diversity
+#| fig-cap: PCoA (Bray-Curtis) of microbial data.
 
 # Run PCoA
 mae[[2]] <- runMDS(
@@ -668,21 +637,22 @@ mae[[2]] <- runMDS(
 )
 
 # Display dissimilarity on a plot
-p <- plotReducedDim(mae[[2]], "MDS", colour_by = "treatment_group") +
-  ggtitle("PCoA plot of Bray-Curtis dissimilarity by treatment group")
+p <- plotReducedDim(mae[[2]], "MDS", colour_by = "timepoint")
 p
 ```
 
-It seems that there are handful of samples that differ from others. However,
-this effect seems not to be associated with the treatment group.
+Distinct patterns in the PCoA plot show samples clustering by time points,
+indicating that microbial profiles vary with salmon age. This reinforces the
+results observed in alpha diversity, supporting an association between age and
+shifts in microbial diversity.
 
 ## Multi-omics integration
 
-Multi-omic factor analysis (MOFA) (see @Argelaguet2020).  allows us to discover latent factors that
-underlie the biological differences by taking in consideration 2 or more omic
-assays. To cite the original authors, "MOFA can be viewed as a statistically
-rigorous generalization of (sparse) principal component analysis (PCA) to
-multi-omics data".
+Multi-omic factor analysis (MOFA) (see @Argelaguet2020) allows us to discover
+latent factors that underlie the biological differences by taking in
+consideration 2 or more omic assays. To cite the original authors, "MOFA can
+be viewed as a statistically rigorous generalization of (sparse) principal
+component analysis (PCA) to multi-omics data".
 
 By applying MOFA analysis, our goal is to determine whether metagenomics and
 fatty acids exhibit shared variability, ultimately assessing whether the
@@ -731,27 +701,31 @@ Next, we will plot the variances explained by each factor.
 
 ```{r}
 #| label: var_factor1
+#| fig-cap: Explained variance by the model for microbial and fatty acid data.
 
-p <- plot_variance_explained(model) +
-    labs(title = "Captured variance of fatty acid and metagenomic\n",
-        "datasets across 5 factors") +
-    theme(plot.title.position = "plot")
+# Plot explained variances
+p <- plot_variance_explained(model)
+# Get explained variances from model as numeric values
+df <- model@cache[[1]][[2]][[1]] |> stack()
+df[["percentage"]] <- paste0(round(df[["value"]]), "%")
+# Add them to plot
+p <- p + geom_shadowtext(aes(label = df[["percentage"]]))
 p
 ```
 
-Factor 1 captures mostly the variance in the metagenomics data.
-Factor 2 captures the shared variability between the metagenomics and fatty acid
-data. While the first factor captures the highest amount of variability in
-metagenomics data, almost as much variability remains to be captured by the
-second factor.
+Factor 1 primarily captures variance within the metagenomics data, while Factor
+2 mostly represents variance in fatty acids, including some shared variability.
+Factors 3 and 4 capture shared variability between the metagenomic data and
+fatty acids, reflecting interconnected patterns between the two datasets.
 
-Before exploring the shared variability, we first examine which taxa's
+Before exploring the shared variability, we first examine which metagenomic
 variability is captured by Factor 1.
 
 ```{r}
 #| label: plot_factor1
 #| fig-width: 10
 #| fig-height: 8
+#| fig-cap: Features with the highest loadings for Factor 1.
 
 p1 <- plot_top_weights(model, view = 1, factors = 1, nfeatures = 25) +
   labs(title = "Fatty acids")
@@ -764,10 +738,13 @@ p1 + p2
 From the plot above, we can see that the first factor captures mostly the
 variability in _Mycoplasma_.
 
+Let us then focus on loadings of factor 2.
+
 ```{r}
 #| label: plot_factor2
 #| fig-width: 10
 #| fig-height: 8
+#| fig-cap: Features with the highest loadings for Factor 2.
 
 p1 <- plot_top_weights(model, view = 1, factors = 2, nfeatures = 25) +
   labs(title = "Fatty acids")
@@ -777,12 +754,35 @@ p2 <- plot_top_weights(model, view = 2, factors = 2, nfeatures = 25) +
 p1 + p2
 ```
 
-From the microbes, especially _Photobacterium_, has a positive association with
-Factor 2. Many fatty acids also show significant weights, with Linoleic acid
-18:2n-6 and sum of omega-6 fatty acids having
-positive weights, among others. This indicates that as the abundance of
-Photobacterium increases, there is a corresponding increase in levels of
-these aforementioned fatty acids.
+In the microbial data, particularly _Cetobacterium_ and _Photobacterium_ show a
+positive association with Factor 2. Additionally, many fatty acids display
+significant weights in this factor, though no single fatty acid can be
+specifically tied to these taxa. This suggests that as the abundances of these
+taxa rise, there is a corresponding increase in overall fatty acid levels.
+
+```{r}
+#| label: plot_factor3
+#| fig-width: 10
+#| fig-height: 15
+#| fig-cap: Features with the highest loadings for Factors 3 and 4.
+
+p <- lapply(c(3, 4), function(x){
+    p1 <- plot_top_weights(model, view = 1, factors = x, nfeatures = 25) +
+        labs(title = paste0("Fatty acids vs factor ", x))
+    p2 <- plot_top_weights(model, view = 2, factors = x, nfeatures = 25) +
+        labs(title = paste0("Microbiota vs factor ", x))
+    res <- list(p1, p2)
+    return(res)
+})
+p <- unlist(p, recursive = FALSE)
+
+wrap_plots(p, ncol = 2)
+```
+
+From the shared Factors 3 and 4, _Aliivibrio_,  _Cetobacterium_, _Vibrio_, and
+_Photobacterium_ emerge prominently. Their association with the 22:1n-11 fatty
+acid and omega-3 fatty acids suggests a potential biological link between these
+microbes and specific fatty acid profiles, hinting at a functional relationship.
 
 ## Conclusions
 
