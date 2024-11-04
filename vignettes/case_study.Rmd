@@ -658,9 +658,10 @@ By applying MOFA analysis, our goal is to determine whether metagenomics and
 fatty acids exhibit shared variability, ultimately assessing whether the
 microbial community is associated with fatty acid composition.
 
-```{r, results = FALSE}
+```{r}
 #| label: fit_mofa
 #| output: false
+#| include: false
 
 mae_temp <- mae
 mae_temp[[2]] <- altExp(mae_temp[[2]], "prev_genus")
@@ -785,6 +786,21 @@ acid and omega-3 fatty acids suggests a potential biological link between these
 microbes and specific fatty acid profiles, hinting at a functional relationship.
 
 ## Conclusions
+
+```{r}
+#| label: create_summary_plot
+#| eval: false
+#| echo: false
+
+features <- c(
+    "Docosahexaenoic acid 22:6n-3 (DHA)", "Eicosapentaenoic acid 20:5n-3 (EPA)")
+p1 <- plotExpression(
+    mae[[1]], features, assay.type = "counts", x = "timepoint",
+    colour_by = "study_group", scales = "free", ncol = 1)
+p2 <- plot_variance_explained(model)
+
+p1 + p2
+```
 
 The present case study has demonstrated how easy and fast it is to
 download large dataset and transform the data into a `MultiAssayExperiment`,
