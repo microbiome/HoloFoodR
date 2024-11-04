@@ -794,8 +794,11 @@ microbes and specific fatty acid profiles, hinting at a functional relationship.
 
 features <- c(
     "Docosahexaenoic acid 22:6n-3 (DHA)", "Eicosapentaenoic acid 20:5n-3 (EPA)")
+tse <- mae[[1]]
+tse <- tse[features, ]
+rownames(tse) <- c("DHA", "EPA")
 p1 <- plotExpression(
-    mae[[1]], features, assay.type = "counts", x = "timepoint",
+    tse, rownames(tse), assay.type = "counts", x = "timepoint",
     colour_by = "study_group", scales = "free", ncol = 1)
 p2 <- plot_variance_explained(model)
 
