@@ -33,6 +33,7 @@ Imports:
 Suggests:
     BiocStyle,
     DT,
+    ggh4x,
     ggsignif,
     knitr,
     MGnifyR,
