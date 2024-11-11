@@ -64,3 +64,6 @@ vignettes/*/*/*.png
 
 # Nix
 *.nix
+
+# lib data
+lib/
