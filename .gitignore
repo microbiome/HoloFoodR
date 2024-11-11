@@ -63,7 +63,4 @@ vignettes/*.html
 vignettes/*/*/*.png
 
 # Nix
-default.nix
-shell.nix
-flake.nix
-
+*.nix
