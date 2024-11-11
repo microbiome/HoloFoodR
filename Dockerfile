@@ -15,19 +15,19 @@ RUN Rscript -e 'repos <- BiocManager::repositories(); \
     include_base = TRUE)'
 
 # Istall CRAN packages for case study
-# RUN Rscript -e 'install.packages(c("DT", "patchwork", "reticulate", "reshape", "shadowtext", "shadowtext", \
-#     "scater", "ggsignif", "stringr", "ggpubr", "GGally", "ggplot2", "knitr", "latex2exp", "UpSetR"))'
+RUN Rscript -e 'install.packages(c("DT", "patchwork", "reticulate", "reshape", "shadowtext", "shadowtext", \
+    "scater", "ggsignif", "stringr", "ggpubr", "magick", "GGally", "ggplot2", "knitr", "latex2exp", "UpSetR"))'
 
 RUN Rscript -e 'install.packages(c("dplyr", "DT", "ggsignif", "latex2exp", "patchwork", "shadowtext", "reticulate"))'
 
 # Install Bioconductor packages for case study
-RUN R -e 'BiocManager::install(c("BiocStyle", "ComplexHeatmap", "MGnifyR", "mia", "miaViz", "MOFA2", "scater"))'
+RUN R -e 'BiocManager::install(c("BiocStyle", "ComplexHeatmap", "MGnifyR", "MOFA2", "scater"))'
+
+# Install mia and miaViz from GitHub
+RUN R -e 'remotes::install_github("microbiome/mia", "microbiome/miaViz")'
 
 # Install HoloFoodR locally
-RUN R -e 'devtools::install(pkg = "/opt/pkg/", build = TRUE)'
-
-# Install mofapy2 for case study
-# RUN python3 -m pip install 'https://github.com/bioFAM/mofapy2/tarball/master'
+RUN R -e 'devtools::install(pkg = "/opt/pkg", build = TRUE)'
 
 # Internal port for RStudio server is 8787
 EXPOSE 8787
