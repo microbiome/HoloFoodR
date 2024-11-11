@@ -24,7 +24,7 @@ jobs:
       matrix:
         config:
           - os: ubuntu-latest
-            bioc: devel-amd64
+            bioc: devel
             r: auto
             cont: ghcr.io/bioconductor/bioconductor_docker:devel
             rspm: ~
