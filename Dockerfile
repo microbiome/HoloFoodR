@@ -15,10 +15,8 @@ RUN Rscript -e 'repos <- BiocManager::repositories(); \
     include_base = TRUE)'
 
 # Istall CRAN packages for case study
-RUN Rscript -e 'install.packages(c("DT", "patchwork", "reticulate", "reshape", "shadowtext", "shadowtext", \
-    "scater", "ggsignif", "stringr", "ggpubr", "magick", "GGally", "ggplot2", "knitr", "latex2exp", "UpSetR"))'
-
-RUN Rscript -e 'install.packages(c("dplyr", "DT", "ggsignif", "latex2exp", "patchwork", "shadowtext", "reticulate"))'
+RUN Rscript -e 'install.packages(c("DT", "patchwork", "reticulate", "reshape", "shadowtext", \
+    "scater", "ggsignif", "ggraph", "stringr", "ggpubr", "magick", "GGally", "ggplot2", "knitr", "latex2exp", "UpSetR"))'
 
 # Install Bioconductor packages for case study
 RUN R -e 'BiocManager::install(c("BiocStyle", "ComplexHeatmap", "MGnifyR", "MOFA2", "scater"))'
