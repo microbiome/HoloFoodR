@@ -382,7 +382,7 @@ sort(prevalence, decreasing = TRUE) |> head(10)
 _Mycoplasma_ is present in all samples, which is not surprising as this genus
 was found to be one of the most common in salmon intestine (see @zarkasiPyrosequencingbasedCharacterizationGastrointestinal2014).
 
-We use thresholds 20% and 0.1% for prevalence and detection, respectively.
+We use thresholds 20% and 0.2% for prevalence and detection, respectively.
 
 ```{r}
 #| label: agglomerate_prevalence
@@ -393,7 +393,7 @@ altExp(mae[[2]], "prev_genus") <- agglomerateByPrevalence(
     assay.type = "relabundance",
     rank = "Genus",
     prevalence = 20 / 100,
-    detection = 0.1 / 100
+    detection = 0.2 / 100
 )
 ```
 
