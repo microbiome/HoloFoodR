@@ -19,13 +19,13 @@ RUN Rscript -e 'install.packages(c("DT", "patchwork", "reticulate", "reshape", "
     "scater", "ggsignif", "ggraph", "stringr", "ggpubr", "magick", "GGally", "ggplot2", "knitr", "latex2exp", "UpSetR"))'
 
 # Install Bioconductor packages for case study
-RUN R -e 'BiocManager::install(c("BiocStyle", "ComplexHeatmap", "MGnifyR", "MOFA2", "scater"))'
+RUN Rscript -e 'BiocManager::install(c("BiocStyle", "ComplexHeatmap", "MGnifyR", "MOFA2", "scater"))'
 
 # Install mia and miaViz from GitHub
-RUN R -e 'remotes::install_github("microbiome/mia", "microbiome/miaViz")'
+RUN Rscript -e 'remotes::install_github(c("microbiome/mia", "microbiome/miaViz"))'
 
 # Install HoloFoodR locally
-RUN R -e 'devtools::install(pkg = "/opt/pkg", build = TRUE)'
+RUN Rscript -e 'devtools::install(pkg = "/opt/pkg", build = TRUE)'
 
 # Install mofapy2 for case study
 RUN python3 -m pip install 'https://github.com/bioFAM/mofapy2/tarball/master'
