@@ -24,7 +24,7 @@ was created by the HoloFood consortium. One of its objectives is to study the
 interactions between animal systems, their microbiomes, and feed additives
 to optimize the diet strategies of these farm animals.
 
-For make it easily accessible, the creators provide an Application Programming
+For make it easily accessible, the developers provide an Application Programming
 Interface (API) that permits interaction with programming languages, such as R
 or Python.
 
@@ -127,8 +127,7 @@ head(salmon_sample_ids)
 The data returned above is a list of all sample accession numbers that are
 associated with all salmons. For example, metagenomic amplicon samples, such as
 [SAMEA112750580](https://www.holofooddata.org/sample/SAMEA112750580)
-or genomic sample, such as
-[SAMEA9068691](https://www.holofooddata.org/sample/SAMEA9068691).
+or fatty acid samples, [SAMEA112950027](https://www.holofooddata.org/sample/SAMEA112950027).
 
 We can use these accession numbers to fetch the data associated with each
 sample type and store them as `experiments` in a `MultiAssayExperiment` (`MAE`)
@@ -170,8 +169,8 @@ mae <- readRDS(file = path)
 
 HoloFood database does not include the data for metagenomic data. This data
 can be retrieved from the [MGnify portal](https://www.ebi.ac.uk/metagenomics).
-For this purpose, we will use MGnifyR package, which in a similar fashion to
-HoloFoodR, allows simple interaction with MGnify API.
+For this purpose, we will use [MGnifyR package](https://bioconductor.org/packages/release/bioc/html/MGnifyR.html),
+which in a similar fashion to HoloFoodR, allows simple interaction with MGnify API.
 
 ```{r}
 #| label: get_metagenomic_samples
@@ -293,15 +292,15 @@ mae <- mae[, colData(mae)[["Trial code"]] == "SA", ]
 ```
 
 Some values of fatty acids are under detection thresholds. We assume them to be
-zeroes. Moreover, the data includes feature that just states from where the
-fatty acids where collected. We remove this feature so that the assay contains
+zeroes. Moreover, the data includes a feature that just states from where the
+fatty acids were collected. We remove this feature to ensure that the assay contains
 only numeric values.
 
 ```{r}
 #| label: preprocess2
 
 # From metabolomic data, remove organ-fatty acids row because it only contains a
-# string value "muscle" which denotes where the sample was drawn.
+# string value "muscle" which denotes where the sample was drawn from
 tse <- mae[[1]]
 tse <- tse[!(rowData(tse)[["marker.name"]] %in% c("Organ-fatty acids")), ]
 mae[[1]] <- tse
@@ -352,9 +351,11 @@ extremely low-abundant genera.
 #| label: prevalence_histgoram
 #| fig-cap: The prevalence of microbial genera across samples.
 
-# Add relative transforrmed data
+# Add relative abundance data
 mae[[2]] <- transformAssay(mae[[2]], method = "relabundance")
 
+# Compute prevalence of relative abundance of microbial genera at detection
+# level of 0.1%
 prevalence <- getPrevalence(
     mae[[2]],
     rank = "Genus",
@@ -367,10 +368,10 @@ prevalence <- getPrevalence(
 # Exclude microbes with 0 prevalence
 prevalence <- prevalence[prevalence != 0]
 
-hist(prevalence)
+hist(prevalence, xlab = "Prevalence")
 ```
 
-We can also look at the raw prevalence numbers
+We can also look at the raw prevalence numbers.
 
 ```{r}
 #| label: display_prevalence_numbers
@@ -382,7 +383,11 @@ sort(prevalence, decreasing = TRUE) |> head(10)
 _Mycoplasma_ is present in all samples, which is not surprising as this genus
 was found to be one of the most common in salmon intestine (see @zarkasiPyrosequencingbasedCharacterizationGastrointestinal2014).
 
-We use thresholds 20% and 0.2% for prevalence and detection, respectively.
+We then agglomerate our data by prevalence and by taxonomic rank to obtain group
+all genera which are below the specified thresholds to the "Other" group.
+This step is necessary to ensure that we only work with the most relevant
+taxa, while not excluding the rest of data points. We use thresholds 20% and
+0.2% for prevalence and detection, respectively.
 
 ```{r}
 #| label: agglomerate_prevalence
@@ -421,10 +426,10 @@ histogram of standard deviations of fatty acid abundances.
 
 ```{r}
 #| label: filter_fatty1
-#| fig-cap: The distribution of standard deviations for fatty acid concentrations.
+#| fig-cap: The distribution of standard deviations of fatty acid abundances.
 
 rowData(mae[[1]])[["sd"]] <- rowSds(assay(mae[[1]], "counts"), na.rm = TRUE)
-hist(rowData(mae[[1]])[["sd"]])
+hist(rowData(mae[[1]])[["sd"]], main = "", xlab = "Standard deviation")
 ```
 
 We apply a filtering threshold of 0.5 to exclude fatty acids that do not
@@ -439,8 +444,16 @@ mae[[1]] <- mae[[1]][ rowData(mae[[1]])[["sd"]] > 0.5, ]
 ```
 
 For more detailed analysis, we pick certain fatty acids that have
-well-established biological relevance. These include 22:6n-3, 20:5n-3, 18:3n-3,
-20:4n-6, 18:2n-6, 18:1n-9, 16:0, and 18:0.
+well-established biological relevance. These include:
+
+* Docosahexaenoic acid (DHA)
+* Eicosapentaenoic acid (EPA)
+* Alpha-linolenic acid
+* Arachidonic acid
+* Linoleic acid
+* Oleic acid
+* Palmitic acid
+* Stearic acid
 
 ```{r}
 #| label: filter_fatty3
@@ -572,6 +585,14 @@ p <- plotAbundance(
     col.var = c("study_group", "timepoint"),
     facet.cols = TRUE, scales = "free_x"
     )
+
+p <- plotAbundance(
+    altExp(mae[[2]], "prev_genus"),
+    assay.type = "relabundance",
+    col.var = c("study_group", "timepoint"),
+    facet.cols = TRUE, scales = "free_x"
+    )
+p
 p
 ```
 
