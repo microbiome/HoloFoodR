@@ -29,5 +29,8 @@ RUN R -e 'remotes::install_github("microbiome/mia", "microbiome/miaViz")'
 # Install HoloFoodR locally
 RUN R -e 'devtools::install(pkg = "/opt/pkg", build = TRUE)'
 
+# Install mofapy2 for case study
+RUN python3 -m pip install 'https://github.com/bioFAM/mofapy2/tarball/master'
+
 # Internal port for RStudio server is 8787
 EXPOSE 8787
