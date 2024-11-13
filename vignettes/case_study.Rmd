@@ -42,7 +42,8 @@ Our main study questions are:
 
 * How does treatment influence the gut microbiota of salmon?
 * Do gut flora and fatty acids composition evolve over time?
-* Is there a relationship between gut microbiota and the fatty acid composition in muscle tissue?
+* Is there a relationship between gut microbiota and the fatty acid composition
+in muscle tissue?
 
 ```{r}
 #| label: start
@@ -127,7 +128,8 @@ head(salmon_sample_ids)
 The data returned above is a list of all sample accession numbers that are
 associated with all salmons. For example, metagenomic amplicon samples, such as
 [SAMEA112750580](https://www.holofooddata.org/sample/SAMEA112750580)
-or fatty acid samples, [SAMEA112950027](https://www.holofooddata.org/sample/SAMEA112950027).
+or fatty acid samples,
+[SAMEA112950027](https://www.holofooddata.org/sample/SAMEA112950027).
 
 We can use these accession numbers to fetch the data associated with each
 sample type and store them as `experiments` in a `MultiAssayExperiment` (`MAE`)
@@ -151,7 +153,7 @@ mae <- HoloFoodR::getResult(
 
 # Save salmon MAE This must be named differently
 path <- system.file(
-  "extdata", "salmon_mae_without_mgnify.RDS", package = "HoloFoodR")
+    "extdata", "salmon_mae_without_mgnify.RDS", package = "HoloFoodR")
 saveRDS(object = mae, file = path)
 ```
 
@@ -161,7 +163,7 @@ saveRDS(object = mae, file = path)
 
 # Read MAE to avoid retrieval
 path <- system.file(
-  "extdata", "salmon_mae_without_mgnify.RDS", package = "HoloFoodR")
+    "extdata", "salmon_mae_without_mgnify.RDS", package = "HoloFoodR")
 mae <- readRDS(file = path)
 ```
 
@@ -169,8 +171,10 @@ mae <- readRDS(file = path)
 
 HoloFood database does not include the data for metagenomic data. This data
 can be retrieved from the [MGnify portal](https://www.ebi.ac.uk/metagenomics).
-For this purpose, we will use [MGnifyR package](https://bioconductor.org/packages/release/bioc/html/MGnifyR.html),
-which in a similar fashion to HoloFoodR, allows simple interaction with MGnify API.
+For this purpose, we will use
+[MGnifyR package](https://bioconductor.org/packages/release/bioc/html/MGnifyR.html),
+which in a similar fashion to HoloFoodR, allows simple interaction with MGnify
+API.
 
 ```{r}
 #| label: get_metagenomic_samples
@@ -217,7 +221,7 @@ tse <- MGnifyR::getResult(
 
 # Save salmon metagenomic TreeSE
 path <- system.file(
-  "extdata", "salmon_metagenomic_tse.RDS", package = "HoloFoodR")
+    "extdata", "salmon_metagenomic_tse.RDS", package = "HoloFoodR")
 saveRDS(object = mae, file = path)
 ```
 
@@ -228,7 +232,7 @@ saveRDS(object = mae, file = path)
 
 # Read in salmon metagenomic TreeSE object
 path <- system.file(
-  "extdata", "salmon_metagenomic_tse.RDS", package = "HoloFoodR")
+    "extdata", "salmon_metagenomic_tse.RDS", package = "HoloFoodR")
 tse <- readRDS(file = path)
 ```
 
@@ -293,8 +297,8 @@ mae <- mae[, colData(mae)[["Trial code"]] == "SA", ]
 
 Some values of fatty acids are under detection thresholds. We assume them to be
 zeroes. Moreover, the data includes a feature that just states from where the
-fatty acids were collected. We remove this feature to ensure that the assay contains
-only numeric values.
+fatty acids were collected. We remove this feature to ensure that the assay
+contains only numeric values.
 
 ```{r}
 #| label: preprocess2
@@ -323,15 +327,17 @@ information.
 
 # Add time points
 timepoints <- colData(mae[[2]])
-timepoints <- timepoints[match(timepoints[["animal"]], rownames(colData(mae))), ]
+timepoints <- timepoints[
+    match(timepoints[["animal"]], rownames(colData(mae))), ]
 timepoints <- ifelse(timepoints[["trial.timepoint"]] == 0, "start", "end")
 timepoints <- factor(timepoints, levels = c("start", "end"))
 colData(mae)[["timepoint"]] <- timepoints
 
 # Add treatment groups
 colData(mae)[["study_group"]] <- ifelse(
-  colData(mae)[["Treatment concentration"]]>0, "treatment", "control")
-colData(mae)[colData(mae)[["timepoint"]] == "start" , "study_group"] <- "control"
+    colData(mae)[["Treatment concentration"]]>0, "treatment", "control")
+colData(mae)[colData(mae)[["timepoint"]] == "start" , "study_group"] <-
+    "control"
 
 # Add animal metadata to separate experiments
 mae[[1]] <- getWithColData(mae, 1)
@@ -344,7 +350,7 @@ Next, we can agglomerate features by prevalence to reduce the number of
 low-abundant taxa and contaminants.
 
 First, we visualize prevalence distribution of taxa with a histogram to decide
-the prevalence threshold to use. We use 0.1% detection level to filter out
+the prevalence threshold to use. We use 0.2% detection level to filter out
 extremely low-abundant genera.
 
 ```{r}
@@ -362,13 +368,13 @@ prevalence <- getPrevalence(
     assay.type = "relabundance",
     na.rm = TRUE,
     sort = TRUE,
-    detection = 0.1 / 100
+    detection = 0.2 / 100
 )
 
 # Exclude microbes with 0 prevalence
 prevalence <- prevalence[prevalence != 0]
 
-hist(prevalence, xlab = "Prevalence")
+hist(prevalence, main = "", xlab = "Prevalence")
 ```
 
 We can also look at the raw prevalence numbers.
@@ -381,7 +387,8 @@ sort(prevalence, decreasing = TRUE) |> head(10)
 ```
 
 _Mycoplasma_ is present in all samples, which is not surprising as this genus
-was found to be one of the most common in salmon intestine (see @zarkasiPyrosequencingbasedCharacterizationGastrointestinal2014).
+was found to be one of the most common in salmon intestine
+(see @zarkasiPyrosequencingbasedCharacterizationGastrointestinal2014).
 
 We then agglomerate our data by prevalence and by taxonomic rank to obtain group
 all genera which are below the specified thresholds to the "Other" group.
@@ -400,22 +407,6 @@ altExp(mae[[2]], "prev_genus") <- agglomerateByPrevalence(
     prevalence = 20 / 100,
     detection = 0.2 / 100
 )
-```
-
-Moreover, we agglomerate the data to include only 19 most abundant genera.
-
-```{r}
-#| label: select_core
-
-tse <- agglomerateByRank(mae[[2]], rank = "Genus")
-core <- getTop(tse, top = 19)
-# Get vector that tells whether taxa belongs to core taxa or not
-core_names <- rownames(tse)
-core_names[ !core_names %in% core ] <- "other"
-# Agglomerate based on core taxa
-rowData(tse)[["core"]] <- core_names
-altExp(mae[[2]], "core_genus") <- agglomerateByVariable(
-  tse, by = "rows", group = "core")
 ```
 
 Due to the limited number of samples, we also filter the fatty acid data to
@@ -459,14 +450,14 @@ well-established biological relevance. These include:
 #| label: filter_fatty3
 
 relevant_fatty_acids <- c(
-  "Docosahexaenoic acid 22:6n-3 (DHA)",
-  "Eicosapentaenoic acid 20:5n-3 (EPA)",
-  "Alpha-Linolenic acid 18:3n-3",
-  "Arachidonic acid 20:4n-6 (ARA)",
-  "Linoleic acid 18:2n-6",
-  "Oleic acid 18:1n-9",
-  "Palmitic acid 16:0",
-  "Stearic acid 18:0"
+    "Docosahexaenoic acid 22:6n-3 (DHA)",
+    "Eicosapentaenoic acid 20:5n-3 (EPA)",
+    "Alpha-Linolenic acid 18:3n-3",
+    "Arachidonic acid 20:4n-6 (ARA)",
+    "Linoleic acid 18:2n-6",
+    "Oleic acid 18:1n-9",
+    "Palmitic acid 16:0",
+    "Stearic acid 18:0"
 )
 altExp(mae[[1]], "relevant") <- mae[[1]][
     rownames(mae[[1]]) %in% relevant_fatty_acids, ]
@@ -580,19 +571,11 @@ composition with relative abundance barplot.
 #| fig-cap: Relative abundance of core microbial genera across samples.
 
 p <- plotAbundance(
-    altExp(mae[[2]], "core_genus"),
-    assay.type = "relabundance",
-    col.var = c("study_group", "timepoint"),
-    facet.cols = TRUE, scales = "free_x"
-    )
-
-p <- plotAbundance(
     altExp(mae[[2]], "prev_genus"),
     assay.type = "relabundance",
     col.var = c("study_group", "timepoint"),
     facet.cols = TRUE, scales = "free_x"
     )
-p
 p
 ```
 
@@ -627,7 +610,7 @@ res
 
 Based on the results, we conclude that older salmon exhibit distinct microbial
 diversity compared to younger ones. Additionally, there appears to be a
-slight—though not statistically significant—effect of treatment on microbial
+slight — though not statistically significant — effect of treatment on microbial
 diversity.
 
 ```{r}
@@ -735,9 +718,9 @@ p <- p + geom_shadowtext(aes(label = df[["percentage"]]))
 p
 ```
 
-Factor 1 primarily captures variance within the metagenomics data, while Factor
-2 mostly represents variance in fatty acids, including some shared variability.
-Factors 3 and 4 capture shared variability between the metagenomic data and
+Factor 1 captures only variance within the metagenomics data, while over 2/3 of
+variance captured by Factor 2 represents variance in fatty acids.
+Factor 3 captures shared variability between the metagenomic data and
 fatty acids, reflecting interconnected patterns between the two datasets.
 
 Before exploring the shared variability, we first examine which metagenomic
@@ -746,13 +729,13 @@ variability is captured by Factor 1.
 ```{r}
 #| label: plot_factor1
 #| fig-width: 10
-#| fig-height: 8
+#| fig-height: 6
 #| fig-cap: Features with the highest loadings for Factor 1.
 
 p1 <- plot_top_weights(model, view = 1, factors = 1, nfeatures = 25) +
-  labs(title = "Fatty acids")
+    labs(title = "Fatty acids")
 p2 <- plot_top_weights(model, view = 2, factors = 1, nfeatures = 25) +
-  labs(title = "Microbiota")
+    labs(title = "Microbiota")
 
 p1 + p2
 ```
@@ -765,46 +748,48 @@ Let us then focus on loadings of factor 2.
 ```{r}
 #| label: plot_factor2
 #| fig-width: 10
-#| fig-height: 8
+#| fig-height: 6
 #| fig-cap: Features with the highest loadings for Factor 2.
 
 p1 <- plot_top_weights(model, view = 1, factors = 2, nfeatures = 25) +
-  labs(title = "Fatty acids")
+    labs(title = "Fatty acids")
 p2 <- plot_top_weights(model, view = 2, factors = 2, nfeatures = 25) +
-  labs(title = "Microbiota")
+    labs(title = "Microbiota")
 
 p1 + p2
 ```
 
-In the microbial data, particularly _Cetobacterium_ and _Photobacterium_ show a
-positive association with Factor 2. Additionally, many fatty acids display
-significant weights in this factor, though no single fatty acid can be
-specifically tied to these taxa. This suggests that as the abundances of these
-taxa rise, there is a corresponding increase in overall fatty acid levels.
+In the microbial data, particularly _Cetobacterium_, _Vibrio_, and _Aliivibrio_
+show a negative association with Factor 2. Additionally, many fatty acids
+display significant negative weights in this factor, though no single fatty
+acid can be specifically tied to these taxa. This suggests that as the
+abundances of these taxa is rise (or decrease), there is a corresponding
+increase (or decrease) in overall fatty acid levels.
+
+Next, we visualize Factor 3 that captured variance more evenly between microbes
+and fatty acids.
 
 ```{r}
 #| label: plot_factor3
 #| fig-width: 10
-#| fig-height: 15
-#| fig-cap: Features with the highest loadings for Factors 3 and 4.
+#| fig-height: 6
+#| fig-cap: Features with the highest loadings for Factors 3.
 
-p <- lapply(c(3, 4), function(x){
-    p1 <- plot_top_weights(model, view = 1, factors = x, nfeatures = 25) +
-        labs(title = paste0("Fatty acids vs factor ", x))
-    p2 <- plot_top_weights(model, view = 2, factors = x, nfeatures = 25) +
-        labs(title = paste0("Microbiota vs factor ", x))
-    res <- list(p1, p2)
-    return(res)
-})
-p <- unlist(p, recursive = FALSE)
+p1 <- plot_top_weights(model, view = 1, factors = 3, nfeatures = 25) +
+    labs(title = "Fatty acids")
+p2 <- plot_top_weights(model, view = 2, factors = 3, nfeatures = 25) +
+    labs(title = "Microbiota")
 
-wrap_plots(p, ncol = 2)
+p1 + p2
 ```
 
-From the shared Factors 3 and 4, _Aliivibrio_,  _Cetobacterium_, _Vibrio_, and
-_Photobacterium_ emerge prominently. Their association with the 22:1n-11 fatty
-acid and omega-3 fatty acids suggests a potential biological link between these
-microbes and specific fatty acid profiles, hinting at a functional relationship.
+From the shared Factor 3, _Photobacterium_ emerge prominently. Similarly to
+Factor 2, no single fatty acid can be directly associated with 
+_Photobacterium_.
+
+Worth noting is that, out of these 5 taxa, only _Mycoplasma_ does not appear to
+share any variability with fatty acids as all its variability was captured by
+the first factor which did not associate with fatty acids.
 
 ## Conclusions
 
