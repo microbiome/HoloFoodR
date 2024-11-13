@@ -733,8 +733,7 @@ variance captured by Factor 2 represents variance in fatty acids.
 Factor 3 captures shared variability between the metagenomic data and
 fatty acids, reflecting interconnected patterns between the two datasets.
 
-Before exploring the shared variability, we first examine which metagenomic
-variability is captured by Factor 1.
+Before exploring the shared variability, we first examine which metagenomic variability is captured by Factor 1. We do not plot fatty acid weights because the captured variability in factor 1 for fatty acids is 0% as seen in the previous plot.
 
 ```{r}
 #| label: plot_factor1
@@ -742,12 +741,10 @@ variability is captured by Factor 1.
 #| fig-height: 6
 #| fig-cap: Features with the highest loadings for Factor 1.
 
-p1 <- plot_top_weights(model, view = 1, factors = 1, nfeatures = 25) +
-    labs(title = "Fatty acids")
 p2 <- plot_top_weights(model, view = 2, factors = 1, nfeatures = 25) +
     labs(title = "Microbiota")
 
-p1 + p2
+p2
 ```
 
 From the plot above, we can see that the first factor captures mostly the
@@ -776,8 +773,7 @@ acid can be specifically tied to these taxa. This suggests that as the
 abundances of these taxa is rise (or decrease), there is a corresponding
 increase (or decrease) in overall fatty acid levels.
 
-Next, we visualize Factor 3 that captured variance more evenly between microbes
-and fatty acids.
+Next, we visualize Factor 3 that captured variance more evenly between microbes and fatty acids.
 
 ```{r}
 #| label: plot_factor3
