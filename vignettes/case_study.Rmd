@@ -790,8 +790,7 @@ p1 + p2
 ```
 
 From the shared Factor 3, _Photobacterium_ emerge prominently. Similarly to
-Factor 2, no single fatty acid can be directly associated with 
-_Photobacterium_.
+Factor 2, no single fatty acid can be directly associated with any of the microbial species, including _Photobacterium_.
 
 Worth noting is that, out of these 5 taxa, only _Mycoplasma_ does not appear to
 share any variability with fatty acids as all its variability was captured by
