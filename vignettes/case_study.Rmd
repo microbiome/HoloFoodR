@@ -585,7 +585,7 @@ p <- plotAbundance(
     assay.type = "relabundance",
     col.var = c("study_group", "timepoint"),
     facet.cols = TRUE, scales = "free_x"
-    ) 
+    ) +
   guides(fill = guide_legend(title = "Genus"))
 p
 ```
