@@ -737,8 +737,6 @@ Before exploring the shared variability, we first examine which metagenomic vari
 
 ```{r}
 #| label: plot_factor1
-#| fig-width: 10
-#| fig-height: 6
 #| fig-cap: Features with the highest loadings for Factor 1.
 
 p2 <- plot_top_weights(model, view = 2, factors = 1, nfeatures = 25) +
