@@ -801,7 +801,16 @@ the first factor which did not associate with fatty acids.
 #| eval: false
 #| echo: false
 
-p1 <- plotAbundance(
+features <- c(
+    "Docosahexaenoic acid 22:6n-3 (DHA)", "Eicosapentaenoic acid 20:5n-3 (EPA)")
+tse <- mae[[1]]
+tse <- tse[features, ]
+rownames(tse) <- c("DHA", "EPA")
+p1 <- plotExpression(
+    tse, rownames(tse), assay.type = "counts", x = "timepoint",
+    colour_by = "study_group", scales = "free", ncol = 1)
+
+p2 <- plotAbundance(
     altExp(mae[[2]], "prev_genus"),
     assay.type = "relabundance",
     col.var = c("study_group", "timepoint"),
@@ -809,16 +818,7 @@ p1 <- plotAbundance(
     ) +
   guides(fill = guide_legend(title = "Genus"))
 
-features <- c(
-    "Docosahexaenoic acid 22:6n-3 (DHA)", "Eicosapentaenoic acid 20:5n-3 (EPA)")
-tse <- mae[[1]]
-tse <- tse[features, ]
-rownames(tse) <- c("DHA", "EPA")
-p2 <- plotExpression(
-    tse, rownames(tse), assay.type = "counts", x = "timepoint",
-    colour_by = "study_group", scales = "free", ncol = 1)
-
-p1 + p2  + plot_layout(widths = c(2, 1))
+p1 + p2  + plot_layout(widths = c(1, 2))
 ```
 
 The present case study has demonstrated how easy and fast it is to
