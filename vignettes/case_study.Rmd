@@ -809,9 +809,16 @@ rownames(tse) <- c("DHA", "EPA")
 p1 <- plotExpression(
     tse, rownames(tse), assay.type = "counts", x = "timepoint",
     colour_by = "study_group", scales = "free", ncol = 1)
-p2 <- plot_variance_explained(model)
 
-p1 + p2
+p2 <- plotAbundance(
+    altExp(mae[[2]], "prev_genus"),
+    assay.type = "relabundance",
+    col.var = c("study_group", "timepoint"),
+    facet.cols = TRUE, scales = "free_x"
+    ) +
+  guides(fill = guide_legend(title = "Genus"))
+
+p1 + p2  + plot_layout(widths = c(1, 2))
 ```
 
 The present case study has demonstrated how easy and fast it is to
