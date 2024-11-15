@@ -801,7 +801,6 @@ the first factor which did not associate with fatty acids.
 #| eval: false
 #| echo: false
 
-
 p1 <- plotAbundance(
     altExp(mae[[2]], "prev_genus"),
     assay.type = "relabundance",
