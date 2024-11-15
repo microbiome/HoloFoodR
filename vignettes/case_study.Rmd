@@ -820,6 +820,34 @@ which in turn gives the researchers access to an extensive plethora of
 downstream tools, such `mia` and `MOFA2` that can be used to pre-process and
 visualize the multi-omics data.
 
+## Appendix
+
+```{r, fig.height = 6, fig.width = 12, paper_figure}
+
+# Extract omage-6 fatty acids
+dha = rownames(tse)[1]
+epa = rownames(tse)[2]
+
+# Abundance plot of microbes by study group and time point
+p_abundance <- plotAbundance(
+    altExp(mae[[2]], "prev_genus"),
+    assay.type = "relabundance",
+    col.var = c("study_group", "timepoint"),
+    facet.cols = TRUE, scales = "free_x"
+    ) +  guides(fill = guide_legend(title = "Genus"))
+  
+
+# Expression plots
+p2_dha <- plotExpression(
+    tse, dha, assay.type = "counts", x = "timepoint",
+    colour_by = "study_group", scales = "free")
+p3_epa <- plotExpression(
+    tse, epa, assay.type = "counts", x = "timepoint",
+    colour_by = "study_group", scales = "free")
+
+(p_abundance + p2_dha / p3_epa) 
+```
+
 ```{r session_info}
 sessionInfo()
 ```
