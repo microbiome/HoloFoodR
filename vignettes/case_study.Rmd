@@ -688,8 +688,15 @@ assays(mae_temp[[2]]) <- assays(mae_temp[[2]])[
     names(assays(mae_temp[[2]])) %in% c("counts")
 ]
 
+# Time points to numeric
+colData(mae_temp)[["timepoint"]] <- ifelse(
+    colData(mae_temp)[["timepoint"]] == "start", 1, 2)
+
 # Transform MAE object to MOFA model
-model <- create_mofa_from_MultiAssayExperiment(mae_temp)
+model <- create_mofa_from_MultiAssayExperiment(
+    mae_temp, extract_metadata = TRUE)
+# Add temporal covariate
+model <- set_covariates(model, covariates = "timepoint")
 
 # Set model's options
 model_opts <- get_default_model_options(model)
@@ -796,10 +803,18 @@ the first factor which did not associate with fatty acids.
 
 ## Conclusions
 
+The present case study has demonstrated how easy and fast it is to
+download large dataset and transform the data into a `MultiAssayExperiment`,
+which in turn gives the researchers access to an extensive plethora of
+downstream tools, such `mia` and `MOFA2` that can be used to pre-process and
+visualize the multi-omics data.
+
+## Appendix
+
 ```{r}
 #| label: create_summary_plot
-#| eval: false
-#| echo: false
+#| fig-height: 6
+#| fig-width: 12
 
 features <- c(
     "Docosahexaenoic acid 22:6n-3 (DHA)", "Eicosapentaenoic acid 20:5n-3 (EPA)")
@@ -808,7 +823,9 @@ tse <- tse[features, ]
 rownames(tse) <- c("DHA", "EPA")
 p1 <- plotExpression(
     tse, rownames(tse), assay.type = "counts", x = "timepoint",
-    colour_by = "study_group", scales = "free", ncol = 1)
+    colour_by = "study_group", scales = "free", ncol = 1) +
+    labs(x = "Time point", y = "Concentration [mg/g]") +
+    guides(colour = guide_legend(title = "Study group"))
 
 p2 <- plotAbundance(
     altExp(mae[[2]], "prev_genus"),
@@ -819,40 +836,6 @@ p2 <- plotAbundance(
   guides(fill = guide_legend(title = "Genus"))
 
 p1 + p2  + plot_layout(widths = c(1, 2))
-```
-
-The present case study has demonstrated how easy and fast it is to
-download large dataset and transform the data into a `MultiAssayExperiment`,
-which in turn gives the researchers access to an extensive plethora of
-downstream tools, such `mia` and `MOFA2` that can be used to pre-process and
-visualize the multi-omics data.
-
-## Appendix
-
-```{r, fig.height = 6, fig.width = 12, paper_figure}
-
-# Extract omage-6 fatty acids
-dha = rownames(tse)[1]
-epa = rownames(tse)[2]
-
-# Abundance plot of microbes by study group and time point
-p_abundance <- plotAbundance(
-    altExp(mae[[2]], "prev_genus"),
-    assay.type = "relabundance",
-    col.var = c("study_group", "timepoint"),
-    facet.cols = TRUE, scales = "free_x"
-    ) +  guides(fill = guide_legend(title = "Genus"))
-  
-
-# Expression plots
-p2_dha <- plotExpression(
-    tse, dha, assay.type = "counts", x = "timepoint",
-    colour_by = "study_group", scales = "free")
-p3_epa <- plotExpression(
-    tse, epa, assay.type = "counts", x = "timepoint",
-    colour_by = "study_group", scales = "free")
-
-(p_abundance + p2_dha / p3_epa) 
 ```
 
 ```{r session_info}
