@@ -688,15 +688,8 @@ assays(mae_temp[[2]]) <- assays(mae_temp[[2]])[
     names(assays(mae_temp[[2]])) %in% c("counts")
 ]
 
-# Time points to numeric
-colData(mae_temp)[["timepoint"]] <- ifelse(
-    colData(mae_temp)[["timepoint"]] == "start", 1, 2)
-
 # Transform MAE object to MOFA model
-model <- create_mofa_from_MultiAssayExperiment(
-    mae_temp, extract_metadata = TRUE)
-# Add temporal covariate
-model <- set_covariates(model, covariates = "timepoint")
+model <- create_mofa_from_MultiAssayExperiment(mae_temp)
 
 # Set model's options
 model_opts <- get_default_model_options(model)
@@ -833,6 +826,7 @@ p2 <- plotAbundance(
     col.var = c("study_group", "timepoint"),
     facet.cols = TRUE, scales = "free_x"
     ) +
+    labs(y = "Relative abundance")
   guides(fill = guide_legend(title = "Genus"))
 
 p1 + p2  + plot_layout(widths = c(1, 2))
