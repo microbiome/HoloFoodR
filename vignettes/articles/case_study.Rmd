@@ -2,7 +2,7 @@
 title: "HoloFoodR R package — case study"
 date: "`r Sys.Date()`"
 package: HoloFoodR
-bibliography: HoloFoodR.bib
+bibliography: ../HoloFoodR.bib
 output:
    BiocStyle::html_document:
        fig_height: 7
@@ -420,7 +420,8 @@ histogram of standard deviations of fatty acid abundances.
 #| fig-cap: The distribution of standard deviations of fatty acid abundances.
 
 rowData(mae[[1]])[["sd"]] <- rowSds(assay(mae[[1]], "counts"), na.rm = TRUE)
-hist(rowData(mae[[1]])[["sd"]], breaks = 30, main = "", xlab = "Standard deviation")
+hist(rowData(mae[[1]])[["sd"]], breaks = 30, main = "",
+    xlab = "Standard deviation")
 
 # Increase the number of x axis ticks
 x_labels <- seq(from = min(assay(mae[[1]])), to = max(assay(mae[[1]])), by = 1)
@@ -428,9 +429,13 @@ axis(side = 1, at = x_labels, labels = x_labels)
 ```
 
 ```{r}
-cat("Proportion of fatty acids with standard deviation below 0.5 is", round(mean(rowData(mae[[1]])[["sd"]] < 0.5), 3), "\n")
+#| label: show_fatty_sd
 
-cat("Proportion of fatty acids with standard deviation below 1 is", round(mean(rowData(mae[[1]])[["sd"]] < 1), 3))
+cat("Proportion of fatty acids with standard deviation below 0.5 is",
+    round(mean(rowData(mae[[1]])[["sd"]] < 0.5), 3), "\n")
+
+cat("Proportion of fatty acids with standard deviation below 1 is",
+    round(mean(rowData(mae[[1]])[["sd"]] < 1), 3))
 ```
 
 We apply a filtering threshold of 0.5 to exclude fatty acids that do not
@@ -733,7 +738,10 @@ variance captured by Factor 2 represents variance in fatty acids.
 Factor 3 captures shared variability between the metagenomic data and
 fatty acids, reflecting interconnected patterns between the two datasets.
 
-Before exploring the shared variability, we first examine which metagenomic variability is captured by Factor 1. We do not plot fatty acid weights because the captured variability in factor 1 for fatty acids is 0% as seen in the previous plot.
+Before exploring the shared variability, we first examine which metagenomic
+variability is captured by Factor 1. We do not plot fatty acid weights because
+the captured variability in factor 1 for fatty acids is 0% as seen in the
+previous plot.
 
 ```{r}
 #| label: plot_factor1
@@ -771,7 +779,8 @@ acid can be specifically tied to these taxa. This suggests that as the
 abundances of these taxa is rise (or decrease), there is a corresponding
 increase (or decrease) in overall fatty acid levels.
 
-Next, we visualize Factor 3 that captured variance more evenly between microbes and fatty acids.
+Next, we visualize Factor 3 that captured variance more evenly between microbes
+and fatty acids.
 
 ```{r}
 #| label: plot_factor3
@@ -788,7 +797,8 @@ p1 + p2
 ```
 
 From the shared Factor 3, _Photobacterium_ emerge prominently. Similarly to
-Factor 2, no single fatty acid can be directly associated with any of the microbial species, including _Photobacterium_.
+Factor 2, no single fatty acid can be directly associated with any of the
+microbial species, including _Photobacterium_.
 
 Worth noting is that, out of these 5 taxa, only _Mycoplasma_ does not appear to
 share any variability with fatty acids as all its variability was captured by
