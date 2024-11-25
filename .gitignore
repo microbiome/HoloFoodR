@@ -63,8 +63,5 @@ renv.lock
 # Additional files from vignette
 vignettes/*/*/*.png
 
-# Nix
-*.nix
-
 # lib data
 lib/
