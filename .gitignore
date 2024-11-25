@@ -21,6 +21,7 @@
 # RStudio files
 .Rproj.user/
 *.Rproj
+.Rprofile
 
 # produced vignettes
 vignettes/*.html
@@ -49,3 +50,18 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 docs
+
+# Environment
+renv/
+renv.lock
+.Rprofile
+
+# direnv stuff
+.envrc
+.direnv
+
+# Additional files from vignette
+vignettes/*/*/*.png
+
+# lib data
+lib/

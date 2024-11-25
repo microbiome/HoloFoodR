@@ -1,13 +1,24 @@
 Package: HoloFoodR
 Type: Package
-Version: 1.1.0
+Version: 1.1.1
 Authors@R:
-    c(person(given = "Tuomas", family = "Borman", role = c("aut", "cre"),
-             email = "tuomas.v.borman@utu.fi",
-             comment = c(ORCID = "0000-0002-8563-8884")),
-      person(given = "Leo", family = "Lahti", role = c("aut"),
-             email = "leo.lahti@iki.fi",
-             comment = c(ORCID = "0000-0001-5537-637X")))
+    c(
+    person(
+        given = "Tuomas", family = "Borman", role = c("aut", "cre"),
+        email = "tuomas.v.borman@utu.fi",
+        comment = c(ORCID = "0000-0002-8563-8884")
+        ),
+    person(
+        given = "Artur", family = "Sannikov", role = c("aut"),
+        email = "arsann@utu.fi",
+        comment = c(ORCID = "0000-0001-7765-123X")
+        ),
+    person(
+        given = "Leo", family = "Lahti", role = c("aut"),
+        email = "leo.lahti@iki.fi",
+        comment = c(ORCID = "0000-0001-5537-637X")
+        )
+    )
 Title: R interface to EBI HoloFood resource
 Description:
     Utility package to facilitate integration and analysis of EBI HoloFood data
@@ -18,8 +29,8 @@ License: Artistic-2.0 | file LICENSE
 Encoding: UTF-8
 Depends:
     R(>= 4.4.0),
-    TreeSummarizedExperiment,
-    MultiAssayExperiment
+    MultiAssayExperiment,
+    TreeSummarizedExperiment
 Imports:
     dplyr,
     httr2,
@@ -28,10 +39,22 @@ Imports:
     stats,
     utils
 Suggests:
-    testthat,
+    BiocStyle,
+    DT,
+    ggh4x,
+    ggsignif,
     knitr,
+    MGnifyR,
+    mia,
+    miaViz,
+    MOFA2,
+    patchwork,
+    reticulate,
     rmarkdown,
-    BiocStyle
+    scater,
+    shadowtext,
+    testthat,
+    UpSetR
 URL: https://github.com/EBI-Metagenomics/HoloFoodR
 BugReports: https://github.com/EBI-Metagenomics/HoloFoodR/issues
 VignetteBuilder: knitr
