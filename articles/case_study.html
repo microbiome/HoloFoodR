@@ -8,8 +8,8 @@
 <title>HoloFoodR R package — case study • HoloFoodR</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="HoloFoodR R package — case study">
 </head>
 <body>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">HoloFoodR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.11</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,9 +62,9 @@
 
       <h1>HoloFoodR R package — case study</h1>
             
-            <h4 data-toc-skip class="date">2024-10-25</h4>
+            <h4 data-toc-skip class="date">2024-11-25</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/EBI-Metagenomics/HoloFoodR/blob/case-study/vignettes/case_study.Rmd" class="external-link"><code>vignettes/case_study.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/EBI-Metagenomics/HoloFoodR/blob/case-study/vignettes/articles/case_study.Rmd" class="external-link"><code>vignettes/articles/case_study.Rmd</code></a></small>
       <div class="d-none name"><code>case_study.Rmd</code></div>
     </div>
 
@@ -79,7 +79,7 @@ systems, chicken and salmon. It was created by the HoloFood consortium.
 One of its objectives is to study the interactions between animal
 systems, their microbiomes, and feed additives to optimize the diet
 strategies of these farm animals.</p>
-<p>For make it easily accessible, the creators provide an Application
+<p>For make it easily accessible, the developers provide an Application
 Programming Interface (API) that permits interaction with programming
 languages, such as R or Python.</p>
 <p>We improve the accessibility by creating the HoloFoodR package that
@@ -93,14 +93,17 @@ Furthermore, we provide a workflow from data exploration to advanced
 machine learning and multi-omics, offering a practical example for
 readers.</p>
 <p>Our main study questions are:</p>
-<pre><code>- Do treatment associate with salmons' gut flora?
-- Do larger salmons have different gut microbiota compared to smaller ones?
-- Do gut microbiota have association with muscle tissue fatty acids?</code></pre>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<ul>
+<li>How does treatment influence the gut microbiota of salmon?</li>
+<li>Do gut flora and fatty acids composition evolve over time?</li>
+<li>Is there a relationship between gut microbiota and the fatty acid
+composition in muscle tissue?</li>
+</ul>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># List of packages that we need</span></span>
 <span><span class="va">packages</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>    <span class="st">"dplyr"</span>, <span class="st">"DT"</span>, <span class="st">"ggsignif"</span>, <span class="st">"HoloFoodR"</span>, <span class="st">"MGnifyR"</span>, <span class="st">"mia"</span>, <span class="st">"miaViz"</span>, <span class="st">"MOFA2"</span>,</span>
-<span>    <span class="st">"patchwork"</span>, <span class="st">"reticulate"</span>, <span class="st">"scater"</span></span>
+<span>    <span class="st">"patchwork"</span>, <span class="st">"reticulate"</span>, <span class="st">"scater"</span>, <span class="st">"shadowtext"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Load all packages into session. Stop if there are packages that were not</span></span>
@@ -149,11 +152,21 @@ readers.</p>
 <span><span class="co">#&gt; Loading required package: GenomicRanges</span></span>
 <span><span class="co">#&gt; Loading required package: stats4</span></span>
 <span><span class="co">#&gt; Loading required package: BiocGenerics</span></span>
+<span><span class="co">#&gt; Loading required package: generics</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'generics'</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:dplyr':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     explain</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     as.difftime, as.factor, as.ordered, intersect, is.element, setdiff,</span></span>
+<span><span class="co">#&gt;     setequal, union</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'BiocGenerics'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:dplyr':</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:dplyr':</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     combine, intersect, setdiff, union</span></span>
+<span><span class="co">#&gt;     combine</span></span>
 <span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     IQR, mad, sd, var, xtabs</span></span>
@@ -161,10 +174,10 @@ readers.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     anyDuplicated, aperm, append, as.data.frame, basename, cbind,</span></span>
 <span><span class="co">#&gt;     colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,</span></span>
-<span><span class="co">#&gt;     get, grep, grepl, intersect, is.unsorted, lapply, Map, mapply,</span></span>
-<span><span class="co">#&gt;     match, mget, order, paste, pmax, pmax.int, pmin, pmin.int,</span></span>
-<span><span class="co">#&gt;     Position, rank, rbind, Reduce, rownames, sapply, saveRDS, setdiff,</span></span>
-<span><span class="co">#&gt;     table, tapply, union, unique, unsplit, which.max, which.min</span></span>
+<span><span class="co">#&gt;     get, grep, grepl, is.unsorted, lapply, Map, mapply, match, mget,</span></span>
+<span><span class="co">#&gt;     order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,</span></span>
+<span><span class="co">#&gt;     rbind, Reduce, rownames, sapply, saveRDS, table, tapply, unique,</span></span>
+<span><span class="co">#&gt;     unsplit, which.max, which.min</span></span>
 <span><span class="co">#&gt; Loading required package: S4Vectors</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'S4Vectors'</span></span>
@@ -214,7 +227,7 @@ readers.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     doQuery, getData, getResult</span></span>
 <span><span class="co">#&gt; Loading required package: mia</span></span>
-<span><span class="co">#&gt; This is mia version 1.13.47</span></span>
+<span><span class="co">#&gt; This is mia version 1.15.6</span></span>
 <span><span class="co">#&gt; - Online documentation and vignettes: https://microbiome.github.io/mia/</span></span>
 <span><span class="co">#&gt; - Online book 'Orchestrating Microbiome Analysis (OMA)': https://microbiome.github.io/OMA/docs/devel/</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -240,6 +253,7 @@ readers.</p>
 <span><span class="co">#&gt; Loading required package: reticulate</span></span>
 <span><span class="co">#&gt; Loading required package: scater</span></span>
 <span><span class="co">#&gt; Loading required package: scuttle</span></span>
+<span><span class="co">#&gt; Loading required package: shadowtext</span></span>
 <span><span class="va">pkgs_not_loaded</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">pkgs_not_loaded</span><span class="op">)</span><span class="op">[</span><span class="va">pkgs_not_loaded</span><span class="op">]</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">pkgs_not_loaded</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"Error in loading the following packages into the session: '"</span>,</span>
@@ -257,7 +271,7 @@ example.</p>
 </h3>
 <p>First of all, we have to query the HoloFood database to retrieve the
 salmon accession numbers.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get salmon samples</span></span>
 <span><span class="va">salmons</span> <span class="op">&lt;-</span> <span class="fu">HoloFoodR</span><span class="fu">::</span><span class="fu"><a href="../reference/doQuery.html">doQuery</a></span><span class="op">(</span><span class="st">"animals"</span>, system <span class="op">=</span> <span class="st">"salmon"</span>, use.cache <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -268,7 +282,7 @@ salmon accession numbers.</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">salmons</span><span class="op">)</span></span></code></pre></div>
 <p>Next, we can retrieve the data associated with each salmon.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get salmon data</span></span>
 <span><span class="va">salmon_data</span> <span class="op">&lt;-</span> <span class="fu">HoloFoodR</span><span class="fu">::</span><span class="fu"><a href="../reference/getData.html">getData</a></span><span class="op">(</span></span>
 <span>    accession.type <span class="op">=</span> <span class="st">"animals"</span>,</span>
@@ -286,11 +300,11 @@ salmon accession numbers.</p>
 <p>The data returned above is a list of all sample accession numbers
 that are associated with all salmons. For example, metagenomic amplicon
 samples, such as <a href="https://www.holofooddata.org/sample/SAMEA112750580" class="external-link">SAMEA112750580</a>
-or genomic sample, such as <a href="https://www.holofooddata.org/sample/SAMEA9068691" class="external-link">SAMEA9068691</a>.</p>
+or fatty acid samples, <a href="https://www.holofooddata.org/sample/SAMEA112950027" class="external-link">SAMEA112950027</a>.</p>
 <p>We can use these accession numbers to fetch the data associated with
 each sample type and store them as <code>experiments</code> in a
 <code>MultiAssayExperiment</code> (<code>MAE</code>) object.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get salmon &lt;- experiments as MAE object</span></span>
 <span><span class="va">mae</span> <span class="op">&lt;-</span> <span class="fu">HoloFoodR</span><span class="fu">::</span><span class="fu"><a href="../reference/getResult.html">getResult</a></span><span class="op">(</span></span>
 <span>    <span class="va">salmon_sample_ids</span>,</span>
@@ -302,9 +316,10 @@ each sample type and store them as <code>experiments</code> in a
 </h3>
 <p>HoloFood database does not include the data for metagenomic data.
 This data can be retrieved from the <a href="https://www.ebi.ac.uk/metagenomics" class="external-link">MGnify portal</a>. For this
-purpose, we will use MGnifyR package, which in a similar fashion to
-HoloFoodR, allows simple interaction with MGnify API.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+purpose, we will use <a href="https://bioconductor.org/packages/release/bioc/html/MGnifyR.html" class="external-link">MGnifyR
+package</a>, which in a similar fashion to HoloFoodR, allows simple
+interaction with MGnify API.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create MGnify object</span></span>
 <span><span class="va">mg</span> <span class="op">&lt;-</span> <span class="fu">MgnifyClient</span><span class="op">(</span></span>
 <span>    useCache <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -324,7 +339,7 @@ HoloFoodR, allows simple interaction with MGnify API.</p>
 <p><code>salmon_analysis_ids</code> character vector holds associations
 of HoloFood metagenomic amplicon accession numbers (SAMEAxxxxxx) to
 their counterparts in MGnify database (MGYAxxxxxx).</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get metagenomic taxonomic data for salmon from MGnify</span></span>
 <span><span class="va">tse</span> <span class="op">&lt;-</span> <span class="fu">MGnifyR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MGnifyR/man/getResult.html" class="external-link">getResult</a></span><span class="op">(</span></span>
 <span>    <span class="va">mg</span>,</span>
@@ -334,7 +349,7 @@ their counterparts in MGnify database (MGYAxxxxxx).</p>
 <p>Data fetched from MGnify has MGnify-specific identifiers. We have to
 first rename samples with HoloFood specific ID and then add the data to
 <code>MultiAssayExperiment</code> combining all the data.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Add MGnify results to HoloFood data</span></span>
 <span><span class="va">mae</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/addMGnify.html">addMGnify</a></span><span class="op">(</span><span class="va">tse</span>, <span class="va">mae</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: 'experiments' dropped; see 'drops()'</span></span>
@@ -364,16 +379,21 @@ transform data assays, and agglomerate the data.</p>
 </h3>
 <p>Below we see upset plot that summarizes the available experiments and
 how samples overlap between them.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">upset_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://github.com/waldronlab/MultiAssayExperiment/reference/upsetSamples.html" class="external-link">upsetSamples</a></span><span class="op">(</span><span class="va">mae</span><span class="op">)</span></span>
 <span><span class="va">upset_plot</span></span></code></pre></div>
-<p><img src="case_study_files/figure-html/upsetplot-1.png" width="700"></p>
+<div class="figure">
+<img src="case_study_files/figure-html/upsetplot-1.png" alt="The distribution of experiments in the dataset, along with the number of samples in each experiment." width="700"><p class="caption">
+The distribution of experiments in the dataset, along with the number of
+samples in each experiment.
+</p>
+</div>
 <p>For demonstration purposes, we will focus on investigating fatty
-acids and metagenomic data (<code>fatty_acids_mg</code> and
-<code>metagenomic_amplicon</code>) within the trial A performed by the
-HoloFood consortium. This trial the health effects of fermented seaweed
-added to the diet of salmons.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+acids and metagenomic data within the trial A performed by the HoloFood
+consortium. This trial the health effects of fermented seaweed added to
+the diet of salmons. The following script subsets the data to include
+aforementioned data.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Harmonize experiment names</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">mae</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">mae</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/chartr.html" class="external-link">tolower</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -388,12 +408,12 @@ added to the diet of salmons.</p>
 <span><span class="co"># Filter MAE object to include only Trial A</span></span>
 <span><span class="va">mae</span> <span class="op">&lt;-</span> <span class="va">mae</span><span class="op">[</span>, <span class="fu">colData</span><span class="op">(</span><span class="va">mae</span><span class="op">)</span><span class="op">[[</span><span class="st">"Trial code"</span><span class="op">]</span><span class="op">]</span> <span class="op">==</span> <span class="st">"SA"</span>, <span class="op">]</span></span></code></pre></div>
 <p>Some values of fatty acids are under detection thresholds. We assume
-them to be zeroes. Moreover, the data includes feature that just states
-from where the fatty acids where collected. We remove this feature so
-that the assay contains only numeric values.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+them to be zeroes. Moreover, the data includes a feature that just
+states from where the fatty acids were collected. We remove this feature
+to ensure that the assay contains only numeric values.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># From metabolomic data, remove organ-fatty acids row because it only contains a</span></span>
-<span><span class="co"># string value "muscle" which denotes where the sample was drawn.</span></span>
+<span><span class="co"># string value "muscle" which denotes where the sample was drawn from</span></span>
 <span><span class="va">tse</span> <span class="op">&lt;-</span> <span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">tse</span> <span class="op">&lt;-</span> <span class="va">tse</span><span class="op">[</span><span class="op">!</span><span class="op">(</span><span class="fu">rowData</span><span class="op">(</span><span class="va">tse</span><span class="op">)</span><span class="op">[[</span><span class="st">"marker.name"</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Organ-fatty acids"</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span></span>
 <span><span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">tse</span></span>
@@ -408,48 +428,28 @@ that the assay contains only numeric values.</p>
 <span><span class="fu">assay</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"counts"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">assay</span></span></code></pre></div>
 <p>Moreover, we wrangle the sample metadata so that it includes all
 necessary information.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Add treatment groups</span></span>
-<span><span class="fu">colData</span><span class="op">(</span><span class="va">mae</span><span class="op">)</span><span class="op">[[</span><span class="st">"treatment_group"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span></span>
-<span>  <span class="fu">colData</span><span class="op">(</span><span class="va">mae</span><span class="op">)</span><span class="op">[[</span><span class="st">"Treatment concentration"</span><span class="op">]</span><span class="op">]</span><span class="op">&gt;</span><span class="fl">0</span>, <span class="st">"treatment"</span>, <span class="st">"control"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Add time points</span></span>
+<span><span class="va">timepoints</span> <span class="op">&lt;-</span> <span class="fu">colData</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">timepoints</span> <span class="op">&lt;-</span> <span class="va">timepoints</span><span class="op">[</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">timepoints</span><span class="op">[[</span><span class="st">"animal"</span><span class="op">]</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="fu">colData</span><span class="op">(</span><span class="va">mae</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span></span>
+<span><span class="va">timepoints</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">timepoints</span><span class="op">[[</span><span class="st">"trial.timepoint"</span><span class="op">]</span><span class="op">]</span> <span class="op">==</span> <span class="fl">0</span>, <span class="st">"start"</span>, <span class="st">"end"</span><span class="op">)</span></span>
+<span><span class="va">timepoints</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">timepoints</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"start"</span>, <span class="st">"end"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">colData</span><span class="op">(</span><span class="va">mae</span><span class="op">)</span><span class="op">[[</span><span class="st">"timepoint"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">timepoints</span></span>
 <span></span>
-<span><span class="co"># Add salmon host mass to MAE colData</span></span>
-<span><span class="fu">colData</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[[</span><span class="st">"host.gutted.mass"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span></span>
-<span>    <span class="fu">colData</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[[</span><span class="st">"host.gutted.mass"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="fu">colData</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[[</span><span class="st">"mass_scaled"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span></span>
-<span>  <span class="fu">colData</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[[</span><span class="st">"host.gutted.mass"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">merged_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span></span>
-<span>    x <span class="op">=</span> <span class="fu">colData</span><span class="op">(</span><span class="va">mae</span><span class="op">)</span>,</span>
-<span>    y <span class="op">=</span> <span class="fu">colData</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"animal"</span>, <span class="st">"host.gutted.mass"</span>, <span class="st">"mass_scaled"</span><span class="op">)</span><span class="op">]</span>,</span>
-<span>    all.x <span class="op">=</span> <span class="cn">TRUE</span>, by <span class="op">=</span> <span class="st">"animal"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">merged_data</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">merged_data</span><span class="op">[[</span><span class="st">"animal"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co"># Order and add back</span></span>
-<span><span class="fu">colData</span><span class="op">(</span><span class="va">mae</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">merged_data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span></span>
-<span>    <span class="fu">colData</span><span class="op">(</span><span class="va">mae</span><span class="op">)</span><span class="op">[[</span><span class="st">"animal"</span><span class="op">]</span><span class="op">]</span>, <span class="va">merged_data</span><span class="op">[[</span><span class="st">"animal"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>, <span class="op">]</span></span>
+<span><span class="co"># Add treatment groups</span></span>
+<span><span class="fu">colData</span><span class="op">(</span><span class="va">mae</span><span class="op">)</span><span class="op">[[</span><span class="st">"study_group"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span></span>
+<span>    <span class="fu">colData</span><span class="op">(</span><span class="va">mae</span><span class="op">)</span><span class="op">[[</span><span class="st">"Treatment concentration"</span><span class="op">]</span><span class="op">]</span><span class="op">&gt;</span><span class="fl">0</span>, <span class="st">"treatment"</span>, <span class="st">"control"</span><span class="op">)</span></span>
+<span><span class="fu">colData</span><span class="op">(</span><span class="va">mae</span><span class="op">)</span><span class="op">[</span><span class="fu">colData</span><span class="op">(</span><span class="va">mae</span><span class="op">)</span><span class="op">[[</span><span class="st">"timepoint"</span><span class="op">]</span><span class="op">]</span> <span class="op">==</span> <span class="st">"start"</span> , <span class="st">"study_group"</span><span class="op">]</span> <span class="op">&lt;-</span></span>
+<span>    <span class="st">"control"</span></span>
 <span></span>
 <span><span class="co"># Add animal metadata to separate experiments</span></span>
 <span><span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://github.com/waldronlab/MultiAssayExperiment/reference/MultiAssayExperiment-helpers.html" class="external-link">getWithColData</a></span><span class="op">(</span><span class="va">mae</span>, <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Ignoring redundant column names in 'colData(x)': canonical_url,</span></span>
 <span><span class="co">#&gt; marker.type</span></span>
 <span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://github.com/waldronlab/MultiAssayExperiment/reference/MultiAssayExperiment-helpers.html" class="external-link">getWithColData</a></span><span class="op">(</span><span class="va">mae</span>, <span class="fl">2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Ignoring redundant column names in 'colData(x)': canonical_url, marker.type,</span></span>
-<span><span class="co">#&gt;   mass_scaled</span></span></code></pre></div>
-<p>As we want to analyze the effect of treatment, we must analyze
-salmons at day 60 because these salmons were sampled after experimental
-period. In contrast, day-0 salmons that were sampled immediately in the
-beginning of the trial.</p>
-<p>We select those samples that are drawn in day 60.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Subset by taking only samples from day 60</span></span>
-<span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">trial.timepoint</span> <span class="op">==</span> <span class="fl">60</span><span class="op">]</span></span>
-<span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">[</span>, <span class="va">samples</span><span class="op">]</span></span>
-<span><span class="co">#&gt; harmonizing input:</span></span>
-<span><span class="co">#&gt;   removing 15 sampleMap rows with 'colname' not in colnames of experiments</span></span>
-<span><span class="co"># Make sure that we have same set of samples from each experiment</span></span>
-<span><span class="va">mae</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://github.com/waldronlab/MultiAssayExperiment/reference/MultiAssayExperiment-helpers.html" class="external-link">intersectColumns</a></span><span class="op">(</span><span class="va">mae</span><span class="op">)</span></span></code></pre></div>
-<p>Now the data includes samples that are taken in day 60. Each animal
-have both microbiota data and fatty acid data.</p>
+<span><span class="co">#&gt; Warning: Ignoring redundant column names in 'colData(x)': canonical_url,</span></span>
+<span><span class="co">#&gt; marker.type</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="filtering-and-agglomeration">Filtering and agglomeration<a class="anchor" aria-label="anchor" href="#filtering-and-agglomeration"></a>
@@ -457,94 +457,114 @@ have both microbiota data and fatty acid data.</p>
 <p>Next, we can agglomerate features by prevalence to reduce the number
 of low-abundant taxa and contaminants.</p>
 <p>First, we visualize prevalence distribution of taxa with a histogram
-to decide the prevalence threshold to use. We use 0.1% detection level
+to decide the prevalence threshold to use. We use 0.2% detection level
 to filter out extremely low-abundant genera.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Add relative transforrmed data</span></span>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Add relative abundance data</span></span>
 <span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">transformAssay</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, method <span class="op">=</span> <span class="st">"relabundance"</span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># Compute prevalence of relative abundance of microbial genera at detection</span></span>
+<span><span class="co"># level of 0.1%</span></span>
 <span><span class="va">prevalence</span> <span class="op">&lt;-</span> <span class="fu">getPrevalence</span><span class="op">(</span></span>
 <span>    <span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>    rank <span class="op">=</span> <span class="st">"Genus"</span>,</span>
 <span>    assay.type <span class="op">=</span> <span class="st">"relabundance"</span>,</span>
 <span>    na.rm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    sort <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>    detection <span class="op">=</span> <span class="fl">0.1</span> <span class="op">/</span> <span class="fl">100</span></span>
+<span>    detection <span class="op">=</span> <span class="fl">0.2</span> <span class="op">/</span> <span class="fl">100</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Exclude microbes with 0 prevalence</span></span>
 <span><span class="va">prevalence</span> <span class="op">&lt;-</span> <span class="va">prevalence</span><span class="op">[</span><span class="va">prevalence</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">]</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">prevalence</span>, main <span class="op">=</span> <span class="st">"Prevalence of microbial taxa"</span>,</span>
-<span>     xlab <span class="op">=</span> <span class="st">"Prevalence"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="case_study_files/figure-html/prevalence_histgoram-1.png" width="700"></p>
-<p>We can also look at the raw prevalence numbers</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">prevalence</span>, main <span class="op">=</span> <span class="st">""</span>, xlab <span class="op">=</span> <span class="st">"Prevalence"</span><span class="op">)</span></span></code></pre></div>
+<div class="figure">
+<img src="case_study_files/figure-html/prevalence_histgoram-1.png" alt="The prevalence of microbial genera across samples." width="700"><p class="caption">
+The prevalence of microbial genera across samples.
+</p>
+</div>
+<p>We can also look at the raw prevalence numbers.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Sort prevalence in decreasing order</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">prevalence</span>, decreasing <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     Mycoplasma Photobacterium     Aliivibrio  Cetobacterium         Vibrio </span></span>
-<span><span class="co">#&gt;      1.0000000      0.9666667      0.6666667      0.6000000      0.5000000 </span></span>
-<span><span class="co">#&gt; Ammopiptanthus  Mycobacterium       Medicago    Paucibacter   Enterococcus </span></span>
-<span><span class="co">#&gt;      0.2000000      0.1666667      0.1333333      0.1000000      0.1000000</span></span></code></pre></div>
+<span><span class="co">#&gt;      0.9777778      0.7111111      0.4000000      0.2666667      0.2444444 </span></span>
+<span><span class="co">#&gt; Ammopiptanthus    Francisella    Paucibacter  Mycobacterium       Medicago </span></span>
+<span><span class="co">#&gt;      0.1555556      0.1333333      0.1111111      0.1111111      0.1111111</span></span></code></pre></div>
 <p><em>Mycoplasma</em> is present in all samples, which is not
 surprising as this genus was found to be one of the most common in
 salmon intestine (see <span class="citation">Zarkasi et al.
 (2014)</span>).</p>
-<p>We use thresholds 20% and 0.1% for prevalence and detection,
+<p>We then agglomerate our data by prevalence and by taxonomic rank to
+obtain group all genera which are below the specified thresholds to the
+“Other” group. This step is necessary to ensure that we only work with
+the most relevant taxa, while not excluding the rest of data points. We
+use thresholds 20% and 0.2% for prevalence and detection,
 respectively.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Agglomerate by prevalence by genus</span></span>
 <span><span class="fu">altExp</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, <span class="st">"prev_genus"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu">agglomerateByPrevalence</span><span class="op">(</span></span>
 <span>    <span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>    assay.type <span class="op">=</span> <span class="st">"relabundance"</span>,</span>
 <span>    rank <span class="op">=</span> <span class="st">"Genus"</span>,</span>
-<span>    prevalence <span class="op">=</span> <span class="fl">0.2</span> <span class="op">/</span> <span class="fl">100</span>,</span>
-<span>    detection <span class="op">=</span> <span class="fl">0.1</span> <span class="op">/</span> <span class="fl">100</span></span>
+<span>    prevalence <span class="op">=</span> <span class="fl">20</span> <span class="op">/</span> <span class="fl">100</span>,</span>
+<span>    detection <span class="op">=</span> <span class="fl">0.2</span> <span class="op">/</span> <span class="fl">100</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>Moreover, we agglomerate the data to include only 19 most abundant
-genera.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">tse</span> <span class="op">&lt;-</span> <span class="fu">agglomerateByRank</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, rank <span class="op">=</span> <span class="st">"Genus"</span><span class="op">)</span></span>
-<span><span class="va">core</span> <span class="op">&lt;-</span> <span class="fu">getTop</span><span class="op">(</span><span class="va">tse</span>, top <span class="op">=</span> <span class="fl">19</span><span class="op">)</span></span>
-<span><span class="co"># Get vector that tells whether taxa belongs to core taxa or not</span></span>
-<span><span class="va">core_names</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">tse</span><span class="op">)</span></span>
-<span><span class="va">core_names</span><span class="op">[</span> <span class="op">!</span><span class="va">core_names</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">core</span> <span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"other"</span></span>
-<span><span class="co"># Agglomerate based on core taxa</span></span>
-<span><span class="fu">rowData</span><span class="op">(</span><span class="va">tse</span><span class="op">)</span><span class="op">[[</span><span class="st">"core"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">core_names</span></span>
-<span><span class="fu">altExp</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, <span class="st">"core_genus"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu">agglomerateByVariable</span><span class="op">(</span></span>
-<span>  <span class="va">tse</span>, by <span class="op">=</span> <span class="st">"rows"</span>, group <span class="op">=</span> <span class="st">"core"</span><span class="op">)</span></span></code></pre></div>
 <p>Due to the limited number of samples, we also filter the fatty acid
 data to include only those fatty acids that show variation within the
 dataset. The rationale is that if a fatty acid does not vary, it cannot
 exhibit differences between groups. We can find out a good threshold for
-the cut-off with a histogram of standard deviations of fatty acid
+the cutoff with a histogram of standard deviations of fatty acid
 abundances.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">rowData</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[[</span><span class="st">"sd"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">rowSds</span><span class="op">(</span><span class="fu">assay</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"counts"</span><span class="op">)</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="fu">rowData</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[[</span><span class="st">"sd"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>    main <span class="op">=</span> <span class="st">"Standard deviation distribution of fatty acid abundances"</span>,</span>
-<span>    xlab <span class="op">=</span> <span class="st">"Standard deviation"</span>,</span>
-<span>    breaks <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></code></pre></div>
-<p><img src="case_study_files/figure-html/filter_fatty1-1.png" width="700"></p>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="fu">rowData</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[[</span><span class="st">"sd"</span><span class="op">]</span><span class="op">]</span>, breaks <span class="op">=</span> <span class="fl">30</span>, main <span class="op">=</span> <span class="st">""</span>,</span>
+<span>    xlab <span class="op">=</span> <span class="st">"Standard deviation"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Increase the number of x axis ticks</span></span>
+<span><span class="va">x_labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fu">assay</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>, to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu">assay</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/axis.html" class="external-link">axis</a></span><span class="op">(</span>side <span class="op">=</span> <span class="fl">1</span>, at <span class="op">=</span> <span class="va">x_labels</span>, labels <span class="op">=</span> <span class="va">x_labels</span><span class="op">)</span></span></code></pre></div>
+<div class="figure">
+<img src="case_study_files/figure-html/filter_fatty1-1.png" alt="The distribution of standard deviations of fatty acid abundances." width="700"><p class="caption">
+The distribution of standard deviations of fatty acid abundances.
+</p>
+</div>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Proportion of fatty acids with standard deviation below 0.5 is"</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="fu">rowData</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[[</span><span class="st">"sd"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;</span> <span class="fl">0.5</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Proportion of fatty acids with standard deviation below 0.5 is 0.617</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Proportion of fatty acids with standard deviation below 1 is"</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="fu">rowData</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[[</span><span class="st">"sd"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;</span> <span class="fl">1</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Proportion of fatty acids with standard deviation below 1 is 0.733</span></span></code></pre></div>
 <p>We apply a filtering threshold of 0.5 to exclude fatty acids that do
 not exhibit sufficient variation in the dataset. Since most standard
 deviations are below 1, it is a reasonable number if we do not want to
 exclude too many fatty acids.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span> <span class="fu">rowData</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">[[</span><span class="st">"sd"</span><span class="op">]</span><span class="op">]</span> <span class="op">&gt;</span> <span class="fl">0.5</span>, <span class="op">]</span></span></code></pre></div>
 <p>For more detailed analysis, we pick certain fatty acids that have
-well-established biological relevance. These include 22:6n-3, 20:5n-3,
-18:3n-3, 20:4n-6, 18:2n-6, 18:1n-9, 16:0, and 18:0.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+well-established biological relevance. These include:</p>
+<ul>
+<li>Docosahexaenoic acid (DHA)</li>
+<li>Eicosapentaenoic acid (EPA)</li>
+<li>Alpha-linolenic acid</li>
+<li>Arachidonic acid</li>
+<li>Linoleic acid</li>
+<li>Oleic acid</li>
+<li>Palmitic acid</li>
+<li>Stearic acid</li>
+</ul>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">relevant_fatty_acids</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>  <span class="st">"Docosahexaenoic acid 22:6n-3 (DHA)"</span>,</span>
-<span>  <span class="st">"Eicosapentaenoic acid 20:5n-3 (EPA)"</span>,</span>
-<span>  <span class="st">"Alpha-Linolenic acid 18:3n-3"</span>,</span>
-<span>  <span class="st">"Arachidonic acid 20:4n-6 (ARA)"</span>,</span>
-<span>  <span class="st">"Linoleic acid 18:2n-6"</span>,</span>
-<span>  <span class="st">"Oleic acid 18:1n-9"</span>,</span>
-<span>  <span class="st">"Palmitic acid 16:0"</span>,</span>
-<span>  <span class="st">"Stearic acid 18:0"</span></span>
+<span>    <span class="st">"Docosahexaenoic acid 22:6n-3 (DHA)"</span>,</span>
+<span>    <span class="st">"Eicosapentaenoic acid 20:5n-3 (EPA)"</span>,</span>
+<span>    <span class="st">"Alpha-Linolenic acid 18:3n-3"</span>,</span>
+<span>    <span class="st">"Arachidonic acid 20:4n-6 (ARA)"</span>,</span>
+<span>    <span class="st">"Linoleic acid 18:2n-6"</span>,</span>
+<span>    <span class="st">"Oleic acid 18:1n-9"</span>,</span>
+<span>    <span class="st">"Palmitic acid 16:0"</span>,</span>
+<span>    <span class="st">"Stearic acid 18:0"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu">altExp</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"relevant"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">relevant_fatty_acids</span>, <span class="op">]</span></span></code></pre></div>
@@ -554,7 +574,7 @@ well-established biological relevance. These include 22:6n-3, 20:5n-3,
 </h3>
 <p>We transform metagenomic counts with relative transformation and
 centered log-ratio method to tackle the compositional data (see <span class="citation">Quinn et al. (2019)</span>).</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Transform microbiome with centered log-ratio method</span></span>
 <span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">transformAssay</span><span class="op">(</span></span>
 <span>    <span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>,</span>
@@ -570,13 +590,12 @@ centered log-ratio method to tackle the compositional data (see <span class="cit
 <span>    MARGIN <span class="op">=</span> <span class="st">"cols"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; A pseudocount of 0.5 was applied.</span></span>
-<span><span class="co">#&gt; A pseudocount of 0.5 was applied.</span></span>
 <span><span class="co">#&gt; A pseudocount of 0.5 was applied.</span></span></code></pre></div>
 <p>Fatty acid data is already compositional as it is measured as
 concentration (mg/g). We apply a log10 transformation to address
 skewness in the data. Finally, the data is standardized to ensure all
 features are on a comparable scale.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">transformAssay</span><span class="op">(</span></span>
 <span>    <span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>    assay.type <span class="op">=</span> <span class="st">"counts"</span>,</span>
@@ -592,145 +611,144 @@ features are on a comparable scale.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="fatty-acids-mass-and-treatment">Fatty acids, mass and treatment<a class="anchor" aria-label="anchor" href="#fatty-acids-mass-and-treatment"></a>
+<h2 id="analyzing-fatty-acids-time-and-treatment-effects">Analyzing fatty acids: Time and treatment effects<a class="anchor" aria-label="anchor" href="#analyzing-fatty-acids-time-and-treatment-effects"></a>
 </h2>
-<div class="section level3">
-<h3 id="does-treatment-affect-fatty-acids">Does treatment affect fatty acids?<a class="anchor" aria-label="anchor" href="#does-treatment-affect-fatty-acids"></a>
-</h3>
-<p>We aim to investigate whether the treatment is associated with
-changes in fatty acid concentrations. To begin, we assess the
-correlation between treatment levels and the concentrations of specific
-fatty acids</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<p>We aim to investigate how fatty acids evolve over time and, more
+importantly, whether the feed additive impacts these fatty acids. To
+achieve this, we will fit a simple linear model for each fatty acid,
+accounting for time and treatment effects in a non-parametric manner.
+These models resemble the Wilcoxon test but include additional
+covariates. This approach will allow us to estimate the variability
+explained by time, treatment, or both factors.</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get fatty acids that we are going to test</span></span>
 <span><span class="va">tse</span> <span class="op">&lt;-</span> <span class="fu">altExp</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"relevant"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># For each fatty acid, test if the groups are different</span></span>
+<span><span class="co"># For each fatty acid, fit linear model</span></span>
 <span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">tse</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">feat</span><span class="op">)</span><span class="op">{</span></span>
-<span>    <span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/pairwise.wilcox.test.html" class="external-link">pairwise.wilcox.test</a></span><span class="op">(</span></span>
-<span>      <span class="fu">assay</span><span class="op">(</span><span class="va">tse</span>, <span class="st">"counts"</span><span class="op">)</span><span class="op">[</span><span class="va">feat</span>, <span class="op">]</span>, <span class="va">tse</span><span class="op">[[</span><span class="st">"treatment_group"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>      p.adjust.method <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span>
+<span>    <span class="co"># Get data of single feature</span></span>
+<span>    <span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">meltSE</span><span class="op">(</span><span class="va">tse</span><span class="op">[</span><span class="va">feat</span>, <span class="op">]</span>, add.col <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>    <span class="co"># Fit model</span></span>
+<span>    <span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rank.html" class="external-link">rank</a></span><span class="op">(</span><span class="va">counts</span><span class="op">)</span> <span class="op">~</span> <span class="va">study_group</span> <span class="op">+</span> <span class="va">timepoint</span>, data <span class="op">=</span> <span class="va">df</span><span class="op">)</span></span>
+<span>    <span class="co"># Get only p-values</span></span>
+<span>    <span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span>
+<span>    <span class="va">res</span> <span class="op">&lt;-</span> <span class="va">res</span><span class="op">[[</span><span class="fl">4</span><span class="op">]</span><span class="op">]</span><span class="op">[</span>, <span class="fl">4</span><span class="op">]</span></span>
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in wilcox.test.default(xi, xj, paired = paired, ...): cannot compute</span></span>
-<span><span class="co">#&gt; exact p-value with ties</span></span>
-<span><span class="co">#&gt; Warning in wilcox.test.default(xi, xj, paired = paired, ...): cannot compute</span></span>
-<span><span class="co">#&gt; exact p-value with ties</span></span>
-<span><span class="co">#&gt; Warning in wilcox.test.default(xi, xj, paired = paired, ...): cannot compute</span></span>
-<span><span class="co">#&gt; exact p-value with ties</span></span>
-<span><span class="co">#&gt; Warning in wilcox.test.default(xi, xj, paired = paired, ...): cannot compute</span></span>
-<span><span class="co">#&gt; exact p-value with ties</span></span>
-<span><span class="co"># Combine results and adjust p -values</span></span>
+<span><span class="co"># Combine results and adjust p-values</span></span>
 <span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">res</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">res</span><span class="op">[[</span><span class="st">"p.value"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/p.adjust.html" class="external-link">p.adjust</a></span><span class="op">(</span><span class="va">res</span><span class="op">[[</span><span class="st">"p.value"</span><span class="op">]</span><span class="op">]</span>, method <span class="op">=</span> <span class="st">"fdr"</span><span class="op">)</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">p.adjust</span>, method <span class="op">=</span> <span class="st">"fdr"</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co"># Add feature names</span></span>
+<span><span class="va">res</span><span class="op">[[</span><span class="st">"feature"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">tse</span><span class="op">)</span></span>
 <span><span class="va">res</span> <span class="op">|&gt;</span> <span class="fu">datatable</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="datatables html-widget html-fill-item" id="htmlwidget-ac96cb3ee4656e2e9ec3" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-ac96cb3ee4656e2e9ec3">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5"],[["Wilcoxon rank sum test with continuity correction"],["Wilcoxon rank sum test with continuity correction"],["Wilcoxon rank sum test with continuity correction"],["Wilcoxon rank sum exact test"],["Wilcoxon rank sum test with continuity correction"]],[["assay(tse, \"counts\")[feat, ] and tse[[\"treatment_group\"]]"],["assay(tse, \"counts\")[feat, ] and tse[[\"treatment_group\"]]"],["assay(tse, \"counts\")[feat, ] and tse[[\"treatment_group\"]]"],["assay(tse, \"counts\")[feat, ] and tse[[\"treatment_group\"]]"],["assay(tse, \"counts\")[feat, ] and tse[[\"treatment_group\"]]"]],[0.9173929463944336,0.5065184394702462,0.8668974111262169,0.8668974111262169,0.8668974111262169],[["none"],["none"],["none"],["none"],["none"]]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>method<\/th>\n      <th>data.name<\/th>\n      <th>p.value<\/th>\n      <th>p.adjust.method<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":3},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"method","targets":1},{"name":"data.name","targets":2},{"name":"p.value","targets":3},{"name":"p.adjust.method","targets":4}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script><p>As observed, the treatment appears to have no significant effect on
-fatty acid concentrations.</p>
-</div>
-<div class="section level3">
-<h3 id="is-there-association-between-salmon-size-and-fatty-acids">Is there association between salmon size and fatty acids?<a class="anchor" aria-label="anchor" href="#is-there-association-between-salmon-size-and-fatty-acids"></a>
-</h3>
-<p>Additionally, it is worth exploring whether the size of the salmon is
-associated with variations in fatty acid levels.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Calculate correlation</span></span>
-<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">getCrossAssociation</span><span class="op">(</span></span>
-<span>    <span class="va">mae</span>, experiment1 <span class="op">=</span> <span class="fl">1</span>, experiment2 <span class="op">=</span> <span class="fl">1</span>, altexp1 <span class="op">=</span> <span class="st">"relevant"</span>,</span>
-<span>    assay.type1 <span class="op">=</span> <span class="st">"standardize"</span>, col.var2 <span class="op">=</span> <span class="st">"mass_scaled"</span>,</span>
-<span>    test.signif <span class="op">=</span> <span class="cn">TRUE</span>, method <span class="op">=</span> <span class="st">"pearson"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; Calculating correlations...</span></span>
-<span><span class="co">#&gt; altexp1: relevant, altexp2: -, assay.type1: standardize, col.var1: -, assay.type2: -, col.var2: mass_scaled</span></span>
-<span><span class="co">#&gt; by: 1, function: stats::cor.test, method: pearson, test.signif: TRUE, p.adj.method: fdr, paired: FALSE, show.warnings: TRUE</span></span>
-<span><span class="va">res</span></span>
-<span><span class="co">#&gt;                                  Var1        Var2       cor        pval</span></span>
-<span><span class="co">#&gt; 1  Docosahexaenoic acid 22:6n-3 (DHA) mass_scaled 0.4694512 0.008864359</span></span>
-<span><span class="co">#&gt; 2 Eicosapentaenoic acid 20:5n-3 (EPA) mass_scaled 0.3666143 0.046294243</span></span>
-<span><span class="co">#&gt; 3               Linoleic acid 18:2n-6 mass_scaled 0.3521072 0.056359869</span></span>
-<span><span class="co">#&gt; 4                  Oleic acid 18:1n-9 mass_scaled 0.3585233 0.051714669</span></span>
-<span><span class="co">#&gt; 5                  Palmitic acid 16:0 mass_scaled 0.4616248 0.010233011</span></span>
-<span><span class="co">#&gt;        p_adj</span></span>
-<span><span class="co">#&gt; 1 0.02558253</span></span>
-<span><span class="co">#&gt; 2 0.05635987</span></span>
-<span><span class="co">#&gt; 3 0.05635987</span></span>
-<span><span class="co">#&gt; 4 0.05635987</span></span>
-<span><span class="co">#&gt; 5 0.02558253</span></span></code></pre></div>
-<p>There appears to be a notable effect: larger salmon seem to have
-slightly higher concentrations of fatty acids. This trend can be further
-illustrated through plots.</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<script type="application/json" data-for="htmlwidget-ac96cb3ee4656e2e9ec3">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6"],[0.000255938439346439,0.000255938439346439,5.383904130267405e-06,2.645278853004506e-05,0.000255938439346439,0.000255938439346439],[0.8596857257098742,0.3342294624493188,0.8596857257098742,0.8596857257098742,0.8596857257098742,0.8596857257098742],[1.534760520219097e-08,1.534760520219097e-08,0.1453026497545623,0.01266582303463466,2.465500702990768e-08,7.473519809489548e-06],["Docosahexaenoic acid 22:6n-3 (DHA)","Eicosapentaenoic acid 20:5n-3 (EPA)","Linoleic acid 18:2n-6","Oleic acid 18:1n-9","Palmitic acid 16:0","Stearic acid 18:0"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>X.Intercept.<\/th>\n      <th>study_grouptreatment<\/th>\n      <th>timepointend<\/th>\n      <th>feature<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[1,2,3]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"X.Intercept.","targets":1},{"name":"study_grouptreatment","targets":2},{"name":"timepointend","targets":3},{"name":"feature","targets":4}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script><p>As observed, treatment does not appear to affect fatty acid
+concentrations significantly. In contrast, time seems to influence
+nearly all fatty acids; as salmon grow, certain fatty acid
+concentrations in their muscle tissue increase. This relationship can be
+further visualized as follows.</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu">plotExpression</span><span class="op">(</span></span>
-<span>    <span class="fu">altExp</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"relevant"</span><span class="op">)</span>,</span>
-<span>    features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="fu">altExp</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"relevant"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    x <span class="op">=</span> <span class="st">"mass_scaled"</span>,</span>
-<span>    assay.type <span class="op">=</span> <span class="st">"standardize"</span>,</span>
-<span>    scales <span class="op">=</span> <span class="st">"free"</span></span>
-<span>    <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_smooth</span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span><span class="op">)</span></span>
-<span><span class="va">p</span></span>
-<span><span class="co">#&gt; `geom_smooth()` using formula = 'y ~ x'</span></span></code></pre></div>
-<p><img src="case_study_files/figure-html/fatty_and_weight2-1.png" width="700"></p>
-<p>As a result of this initial analysis of fatty acids, we discovered
-that the size of the salmon appears to have some association with fatty
-acid concentrations, although this association is not statistically
-significant.</p>
+<span>    <span class="va">tse</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">tse</span><span class="op">)</span>, assay.type <span class="op">=</span> <span class="st">"counts"</span>, x <span class="op">=</span> <span class="st">"timepoint"</span>,</span>
+<span>    colour_by <span class="op">=</span> <span class="st">"study_group"</span>, scales <span class="op">=</span> <span class="st">"free"</span><span class="op">)</span></span>
+<span><span class="va">p</span></span></code></pre></div>
+<div class="figure">
+<img src="case_study_files/figure-html/fatty_and_treatment_vis-1.png" alt="Concentrations of selected fatty acids at the start and end of the trial, with an indication of whether animals received treatment." width="700"><p class="caption">
+Concentrations of selected fatty acids at the start and end of the
+trial, with an indication of whether animals received treatment.
+</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="microbiota-mass-and-treatment">Microbiota, mass and treatment<a class="anchor" aria-label="anchor" href="#microbiota-mass-and-treatment"></a>
+<h2 id="analyzing-microbiota-time-and-treatment-effects">Analyzing microbiota: Time and treatment effects<a class="anchor" aria-label="anchor" href="#analyzing-microbiota-time-and-treatment-effects"></a>
 </h2>
 <div class="section level3">
 <h3 id="microbial-composition">Microbial composition<a class="anchor" aria-label="anchor" href="#microbial-composition"></a>
 </h3>
 <p>As a first step in analysing microbiota data, we summarize the
 microbial composition with relative abundance barplot.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu">plotAbundance</span><span class="op">(</span></span>
-<span>    <span class="fu">altExp</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, <span class="st">"core_genus"</span><span class="op">)</span>,</span>
+<span>    <span class="fu">altExp</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, <span class="st">"prev_genus"</span><span class="op">)</span>,</span>
 <span>    assay.type <span class="op">=</span> <span class="st">"relabundance"</span>,</span>
-<span>    col.var <span class="op">=</span> <span class="st">"treatment_group"</span>,</span>
+<span>    col.var <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"study_group"</span>, <span class="st">"timepoint"</span><span class="op">)</span>,</span>
 <span>    facet.cols <span class="op">=</span> <span class="cn">TRUE</span>, scales <span class="op">=</span> <span class="st">"free_x"</span></span>
-<span>    <span class="op">)</span></span>
+<span>    <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">guides</span><span class="op">(</span>fill <span class="op">=</span> <span class="fu">guide_legend</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Genus"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">p</span></span>
-<span><span class="co">#&gt; Warning: Removed 200 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">#&gt; Warning: Removed 44 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">#&gt; (`geom_bar()`).</span></span></code></pre></div>
-<p><img src="case_study_files/figure-html/abundance_plot-1.png" width="700"></p>
+<div class="figure">
+<img src="case_study_files/figure-html/abundance_plot-1.png" alt="Relative abundance of core microbial genera across samples." width="700"><p class="caption">
+Relative abundance of core microbial genera across samples.
+</p>
+</div>
 <p>Salmon gut seems to be dominated by either genus <em>Mycoplasma</em>
 or <em>Photobacterium</em>.</p>
 </div>
 <div class="section level3">
-<h3 id="is-alpha-diversity-associated-with-treatment-or-mass-of-salmon">Is alpha diversity associated with treatment or mass of salmon?<a class="anchor" aria-label="anchor" href="#is-alpha-diversity-associated-with-treatment-or-mass-of-salmon"></a>
+<h3 id="association-of-alpha-diversity-with-treatment-and-salmon-age">Association of alpha diversity with treatment and salmon age<a class="anchor" aria-label="anchor" href="#association-of-alpha-diversity-with-treatment-and-salmon-age"></a>
 </h3>
-<p>Next, let’s calculate the Shannon alpha diversity index and test
-whether diversity is associated with both size and treatment.</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<p>Now, let’s proceed to calculate the Shannon alpha diversity
+index.</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Calculate alpha diversity</span></span>
 <span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">addAlpha</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: 'faith' index can be calculated only for TreeSE with rowTree(x)</span></span>
-<span><span class="co">#&gt; populated or with 'tree' provided separately.</span></span>
-<span></span>
-<span><span class="co"># Plot with metadata</span></span>
-<span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu">plotColData</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, x <span class="op">=</span> <span class="st">"mass_scaled"</span>, y <span class="op">=</span> <span class="st">"shannon_diversity"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_smooth</span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"Shannon diversity association\nwith body mass"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">xlab</span><span class="op">(</span><span class="st">"Scaled body mass"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ylab</span><span class="op">(</span><span class="st">"Shannon diversity index"</span><span class="op">)</span></span>
-<span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu">plotColData</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, x <span class="op">=</span> <span class="st">"treatment_group"</span>, y <span class="op">=</span> <span class="st">"shannon_diversity"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu">geom_signif</span><span class="op">(</span>comparisons <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"control"</span>, <span class="st">"treatment"</span><span class="op">)</span><span class="op">)</span>, <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"Shannon diversity association\nwith treatment"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">xlab</span><span class="op">(</span><span class="st">"Treatment group"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ylab</span><span class="op">(</span><span class="st">"Shannon diversity index"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span></span>
-<span><span class="co">#&gt; `geom_smooth()` using formula = 'y ~ x'</span></span></code></pre></div>
-<p><img src="case_study_files/figure-html/alpha-1.png" width="700"></p>
-<p>Once again, we observe a potential effect, this time between
-treatment and microbial diversity, although it is not statistically
-significant. Additionally, there is no association between diversity and
-mass.</p>
+<span><span class="co">#&gt; populated or with 'tree' provided separately.</span></span></code></pre></div>
+<p>With the alpha diversity indices calculated and added to
+<code>colData</code>, we can now assess whether time and treatment
+influence the microbial diversity in the salmon gut flora.</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Get sample metadata</span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">colData</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co"># Fit model to estimate influence of treatment and time to diversity</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rank.html" class="external-link">rank</a></span><span class="op">(</span><span class="va">shannon_diversity</span><span class="op">)</span> <span class="op">~</span> <span class="va">study_group</span> <span class="op">+</span> <span class="va">timepoint</span>, data <span class="op">=</span> <span class="va">df</span><span class="op">)</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span>
+<span><span class="va">res</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; lm(formula = rank(shannon_diversity) ~ study_group + timepoint, </span></span>
+<span><span class="co">#&gt;     data = df)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residuals:</span></span>
+<span><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></span>
+<span><span class="co">#&gt; -20.933 -10.267  -3.267   9.067  27.200 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;                      Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">#&gt; (Intercept)            16.800      3.138   5.353 3.36e-06 ***</span></span>
+<span><span class="co">#&gt; study_grouptreatment   -8.333      4.438  -1.878  0.06738 .  </span></span>
+<span><span class="co">#&gt; timepointend           13.467      4.438   3.034  0.00412 ** </span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residual standard error: 12.15 on 42 degrees of freedom</span></span>
+<span><span class="co">#&gt; Multiple R-squared:  0.1826, Adjusted R-squared:  0.1436 </span></span>
+<span><span class="co">#&gt; F-statistic:  4.69 on 2 and 42 DF,  p-value: 0.0145</span></span></code></pre></div>
+<p>Based on the results, we conclude that older salmon exhibit distinct
+microbial diversity compared to younger ones. Additionally, there
+appears to be a slight — though not statistically significant — effect
+of treatment on microbial diversity.</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu">plotColData</span><span class="op">(</span></span>
+<span>    <span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, x <span class="op">=</span> <span class="st">"timepoint"</span>, y <span class="op">=</span> <span class="st">"shannon_diversity"</span>,</span>
+<span>    colour_by <span class="op">=</span> <span class="st">"study_group"</span><span class="op">)</span></span>
+<span><span class="va">p</span></span></code></pre></div>
+<div class="figure">
+<img src="case_study_files/figure-html/alpha3-1.png" alt="Shannon diversity of microbial communities in salmon at the start and end of the trial, with information on treatment status." width="700"><p class="caption">
+Shannon diversity of microbial communities in salmon at the start and
+end of the trial, with information on treatment status.
+</p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="microbial-dissimilarity-among-samples">Microbial dissimilarity among samples<a class="anchor" aria-label="anchor" href="#microbial-dissimilarity-among-samples"></a>
+</h3>
 <p>Let’s analyze whether we can find similar effect with beta diversity.
 Here we perform Principal Coordinate Analysis (PCoA) with Bray-Curtis
 dissimilarity.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run PCoA</span></span>
 <span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">runMDS</span><span class="op">(</span></span>
 <span>    <span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>,</span>
@@ -740,19 +758,23 @@ dissimilarity.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Display dissimilarity on a plot</span></span>
-<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu">plotReducedDim</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, <span class="st">"MDS"</span>, colour_by <span class="op">=</span> <span class="st">"treatment_group"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"PCoA plot of Bray-Curtis dissimilarity by treatment group"</span><span class="op">)</span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu">plotReducedDim</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, <span class="st">"MDS"</span>, colour_by <span class="op">=</span> <span class="st">"timepoint"</span><span class="op">)</span></span>
 <span><span class="va">p</span></span></code></pre></div>
-<p><img src="case_study_files/figure-html/pcoa_beta_diversity-1.png" width="700"></p>
-<p>It seems that there are handful of samples that differ from others.
-However, this effect seems not to be associated with the treatment
-group.</p>
+<div class="figure">
+<img src="case_study_files/figure-html/pcoa_beta_diversity-1.png" alt="PCoA (Bray-Curtis) of microbial data." width="700"><p class="caption">
+PCoA (Bray-Curtis) of microbial data.
+</p>
+</div>
+<p>Distinct patterns in the PCoA plot show samples clustering by time
+points, indicating that microbial profiles vary with salmon age. This
+reinforces the results observed in alpha diversity, supporting an
+association between age and shifts in microbial diversity.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="multi-omics-integration">Multi-omics integration<a class="anchor" aria-label="anchor" href="#multi-omics-integration"></a>
 </h2>
-<p>Multi-omic factor analysis (MOFA) (see <span class="citation">Argelaguet et al. (2020)</span>). allows us to discover
+<p>Multi-omic factor analysis (MOFA) (see <span class="citation">Argelaguet et al. (2020)</span>) allows us to discover
 latent factors that underlie the biological differences by taking in
 consideration 2 or more omic assays. To cite the original authors, “MOFA
 can be viewed as a statistically rigorous generalization of (sparse)
@@ -761,7 +783,7 @@ principal component analysis (PCA) to multi-omics data”.</p>
 metagenomics and fatty acids exhibit shared variability, ultimately
 assessing whether the microbial community is associated with fatty acid
 composition.</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mae_temp</span> <span class="op">&lt;-</span> <span class="va">mae</span></span>
 <span><span class="va">mae_temp</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">altExp</span><span class="op">(</span><span class="va">mae_temp</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, <span class="st">"prev_genus"</span><span class="op">)</span></span>
 <span></span>
@@ -792,6 +814,9 @@ composition.</p>
 <span>    model_options <span class="op">=</span> <span class="va">model_opts</span>,</span>
 <span>    training_options <span class="op">=</span> <span class="va">train_opts</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in prepare_mofa(object = model, model_options = model_opts,</span></span>
+<span><span class="co">#&gt; training_options = train_opts): Some view(s) have less than 15 features, MOFA</span></span>
+<span><span class="co">#&gt; will have little power to to learn meaningful factors for these view(s)....</span></span>
 <span><span class="co">#&gt; Checking data options...</span></span>
 <span><span class="co">#&gt; No data options specified, using default...</span></span>
 <span><span class="co">#&gt; Checking training options...</span></span>
@@ -799,48 +824,90 @@ composition.</p>
 <span></span>
 <span><span class="co"># Train model</span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">run_mofa</span><span class="op">(</span><span class="va">model</span>, use_basilisk <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in run_mofa(model, use_basilisk = TRUE): No output filename provided. Using /tmp/RtmpMzVUZB/mofa_20241025-101403.hdf5 to store the trained model.</span></span>
+<span><span class="co">#&gt; Warning in run_mofa(model, use_basilisk = TRUE): No output filename provided. Using /tmp/RtmpQGTWbu/mofa_20241125-094929.hdf5 to store the trained model.</span></span>
 <span><span class="co">#&gt; Connecting to the mofapy2 package using basilisk. </span></span>
-<span><span class="co">#&gt;     Set 'use_basilisk' to FALSE if you prefer to manually set the python binary using 'reticulate'.</span></span></code></pre></div>
+<span><span class="co">#&gt;     Set 'use_basilisk' to FALSE if you prefer to manually set the python binary using 'reticulate'.</span></span>
+<span><span class="co">#&gt; + /github/home/.cache/R/basilisk/1.19.0/0/bin/conda create --yes --prefix /github/home/.cache/R/basilisk/1.19.0/MOFA2/1.17.0/mofa_env 'python=3.10.5' --quiet -c conda-forge --override-channels</span></span>
+<span><span class="co">#&gt; + /github/home/.cache/R/basilisk/1.19.0/0/bin/conda install --yes --prefix /github/home/.cache/R/basilisk/1.19.0/MOFA2/1.17.0/mofa_env 'python=3.10.5' -c conda-forge --override-channels</span></span>
+<span><span class="co">#&gt; + /github/home/.cache/R/basilisk/1.19.0/0/bin/conda install --yes --prefix /github/home/.cache/R/basilisk/1.19.0/MOFA2/1.17.0/mofa_env -c conda-forge 'python=3.10.5' 'python=3.10.5' 'numpy=1.23.1' 'scipy=1.8.1' 'pandas=1.4.3' 'h5py=3.6.0' 'scikit-learn=1.1.1' 'dtw-python=1.2.2' --override-channels</span></span></code></pre></div>
 <p>Next, we will plot the variances explained by each factor.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu">plot_variance_explained</span><span class="op">(</span><span class="va">model</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Captured variance of fatty acid and metagenomic\n"</span>,</span>
-<span>        <span class="st">"datasets across 5 factors"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu">theme</span><span class="op">(</span>plot.title.position <span class="op">=</span> <span class="st">"plot"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Plot explained variances</span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu">plot_variance_explained</span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
+<span><span class="co"># Get explained variances from model as numeric values</span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">model</span><span class="op">@</span><span class="va">cache</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/stack.html" class="external-link">stack</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">df</span><span class="op">[[</span><span class="st">"percentage"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">df</span><span class="op">[[</span><span class="st">"value"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>, <span class="st">"%"</span><span class="op">)</span></span>
+<span><span class="co"># Add them to plot</span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="va">p</span> <span class="op">+</span> <span class="fu">geom_shadowtext</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>label <span class="op">=</span> <span class="va">df</span><span class="op">[[</span><span class="st">"percentage"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">p</span></span></code></pre></div>
-<p><img src="case_study_files/figure-html/var_factor1-1.png" width="700"></p>
-<p>Factor 1 captures mostly the variance in the metagenomics data.
-Factor 2 captures the shared variability between the metagenomics and
-fatty acid data. While the first factor captures the highest amount of
-variability in metagenomics data, almost as much variability remains to
-be captured by the second factor.</p>
+<div class="figure">
+<img src="case_study_files/figure-html/var_factor1-1.png" alt="Explained variance by the model for microbial and fatty acid data." width="700"><p class="caption">
+Explained variance by the model for microbial and fatty acid data.
+</p>
+</div>
+<p>Factor 1 captures only variance within the metagenomics data, while
+over 2/3 of variance captured by Factor 2 represents variance in fatty
+acids. Factor 3 captures shared variability between the metagenomic data
+and fatty acids, reflecting interconnected patterns between the two
+datasets.</p>
 <p>Before exploring the shared variability, we first examine which
-taxa’s variability is captured by Factor 1.</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu">plot_top_weights</span><span class="op">(</span><span class="va">model</span>, view <span class="op">=</span> <span class="fl">1</span>, factors <span class="op">=</span> <span class="fl">1</span>, nfeatures <span class="op">=</span> <span class="fl">25</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Fatty acids"</span><span class="op">)</span></span>
-<span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu">plot_top_weights</span><span class="op">(</span><span class="va">model</span>, view <span class="op">=</span> <span class="fl">2</span>, factors <span class="op">=</span> <span class="fl">1</span>, nfeatures <span class="op">=</span> <span class="fl">25</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Microbiota"</span><span class="op">)</span></span>
+metagenomic variability is captured by Factor 1. We do not plot fatty
+acid weights because the captured variability in factor 1 for fatty
+acids is 0% as seen in the previous plot.</p>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu">plot_top_weights</span><span class="op">(</span><span class="va">model</span>, view <span class="op">=</span> <span class="fl">2</span>, factors <span class="op">=</span> <span class="fl">1</span>, nfeatures <span class="op">=</span> <span class="fl">25</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Microbiota"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span></span></code></pre></div>
-<p><img src="case_study_files/figure-html/plot_factor1-1.png" width="960"></p>
+<span><span class="va">p2</span></span></code></pre></div>
+<div class="figure">
+<img src="case_study_files/figure-html/plot_factor1-1.png" alt="Features with the highest loadings for Factor 1." width="700"><p class="caption">
+Features with the highest loadings for Factor 1.
+</p>
+</div>
 <p>From the plot above, we can see that the first factor captures mostly
 the variability in <em>Mycoplasma</em>.</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<p>Let us then focus on loadings of factor 2.</p>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu">plot_top_weights</span><span class="op">(</span><span class="va">model</span>, view <span class="op">=</span> <span class="fl">1</span>, factors <span class="op">=</span> <span class="fl">2</span>, nfeatures <span class="op">=</span> <span class="fl">25</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Fatty acids"</span><span class="op">)</span></span>
+<span>    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Fatty acids"</span><span class="op">)</span></span>
 <span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu">plot_top_weights</span><span class="op">(</span><span class="va">model</span>, view <span class="op">=</span> <span class="fl">2</span>, factors <span class="op">=</span> <span class="fl">2</span>, nfeatures <span class="op">=</span> <span class="fl">25</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Microbiota"</span><span class="op">)</span></span>
+<span>    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Microbiota"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span></span></code></pre></div>
-<p><img src="case_study_files/figure-html/plot_factor2-1.png" width="960"></p>
-<p>From the microbes, especially <em>Photobacterium</em>, has a positive
-association with Factor 2. Many fatty acids also show significant
-weights, with Linoleic acid 18:2n-6 and sum of omega-6 fatty acids
-having positive weights, among others. This indicates that as the
-abundance of Photobacterium increases, there is a corresponding increase
-in levels of these aforementioned fatty acids.</p>
+<div class="figure">
+<img src="case_study_files/figure-html/plot_factor2-1.png" alt="Features with the highest loadings for Factor 2." width="960"><p class="caption">
+Features with the highest loadings for Factor 2.
+</p>
+</div>
+<p>In the microbial data, particularly <em>Cetobacterium</em>,
+<em>Vibrio</em>, and <em>Aliivibrio</em> show a negative association
+with Factor 2. Additionally, many fatty acids display significant
+negative weights in this factor, though no single fatty acid can be
+specifically tied to these taxa. This suggests that as the abundances of
+these taxa is rise (or decrease), there is a corresponding increase (or
+decrease) in overall fatty acid levels.</p>
+<p>Next, we visualize Factor 3 that captured variance more evenly
+between microbes and fatty acids.</p>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu">plot_top_weights</span><span class="op">(</span><span class="va">model</span>, view <span class="op">=</span> <span class="fl">1</span>, factors <span class="op">=</span> <span class="fl">3</span>, nfeatures <span class="op">=</span> <span class="fl">25</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Fatty acids"</span><span class="op">)</span></span>
+<span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu">plot_top_weights</span><span class="op">(</span><span class="va">model</span>, view <span class="op">=</span> <span class="fl">2</span>, factors <span class="op">=</span> <span class="fl">3</span>, nfeatures <span class="op">=</span> <span class="fl">25</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Microbiota"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span></span></code></pre></div>
+<div class="figure">
+<img src="case_study_files/figure-html/plot_factor3-1.png" alt="Features with the highest loadings for Factors 3." width="960"><p class="caption">
+Features with the highest loadings for Factors 3.
+</p>
+</div>
+<p>From the shared Factor 3, <em>Photobacterium</em> emerge prominently.
+Similarly to Factor 2, no single fatty acid can be directly associated
+with any of the microbial species, including
+<em>Photobacterium</em>.</p>
+<p>Worth noting is that, out of these 5 taxa, only <em>Mycoplasma</em>
+does not appear to share any variability with fatty acids as all its
+variability was captured by the first factor which did not associate
+with fatty acids.</p>
 </div>
 <div class="section level2">
 <h2 id="conclusions">Conclusions<a class="anchor" aria-label="anchor" href="#conclusions"></a>
@@ -851,15 +918,47 @@ download large dataset and transform the data into a
 access to an extensive plethora of downstream tools, such
 <code>mia</code> and <code>MOFA2</code> that can be used to pre-process
 and visualize the multi-omics data.</p>
+</div>
+<div class="section level2">
+<h2 id="appendix">Appendix<a class="anchor" aria-label="anchor" href="#appendix"></a>
+</h2>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">features</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"Docosahexaenoic acid 22:6n-3 (DHA)"</span>, <span class="st">"Eicosapentaenoic acid 20:5n-3 (EPA)"</span><span class="op">)</span></span>
+<span><span class="va">tse</span> <span class="op">&lt;-</span> <span class="va">mae</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="va">tse</span> <span class="op">&lt;-</span> <span class="va">tse</span><span class="op">[</span><span class="va">features</span>, <span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">tse</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DHA"</span>, <span class="st">"EPA"</span><span class="op">)</span></span>
+<span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu">plotExpression</span><span class="op">(</span></span>
+<span>    <span class="va">tse</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">tse</span><span class="op">)</span>, assay.type <span class="op">=</span> <span class="st">"counts"</span>, x <span class="op">=</span> <span class="st">"timepoint"</span>,</span>
+<span>    colour_by <span class="op">=</span> <span class="st">"study_group"</span>, scales <span class="op">=</span> <span class="st">"free"</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Time point"</span>, y <span class="op">=</span> <span class="st">"Concentration [mg/g]"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu">guides</span><span class="op">(</span>colour <span class="op">=</span> <span class="fu">guide_legend</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Study group"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu">plotAbundance</span><span class="op">(</span></span>
+<span>    <span class="fu">altExp</span><span class="op">(</span><span class="va">mae</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, <span class="st">"prev_genus"</span><span class="op">)</span>,</span>
+<span>    assay.type <span class="op">=</span> <span class="st">"relabundance"</span>,</span>
+<span>    col.var <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"study_group"</span>, <span class="st">"timepoint"</span><span class="op">)</span>,</span>
+<span>    facet.cols <span class="op">=</span> <span class="cn">TRUE</span>, scales <span class="op">=</span> <span class="st">"free_x"</span></span>
+<span>    <span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu">labs</span><span class="op">(</span>y <span class="op">=</span> <span class="st">"Relative abundance"</span><span class="op">)</span></span>
+<span>  <span class="fu">guides</span><span class="op">(</span>fill <span class="op">=</span> <span class="fu">guide_legend</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Genus"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;Guides[1] ggproto object&gt;</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; fill : &lt;GuideLegend&gt;</span></span>
+<span></span>
+<span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span>  <span class="op">+</span> <span class="fu">plot_layout</span><span class="op">(</span>widths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: Removed 44 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">#&gt; (`geom_bar()`).</span></span></code></pre></div>
+<p><img src="case_study_files/figure-html/create_summary_plot-1.png" width="1152"></p>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R version 4.4.1 (2024-06-14)</span></span>
+<span><span class="co">#&gt; R Under development (unstable) (2024-11-20 r87352)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
-<span><span class="co">#&gt; Running under: Ubuntu 22.04.5 LTS</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 24.04.1 LTS</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Matrix products: default</span></span>
 <span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
-<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0</span></span>
+<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; locale:</span></span>
 <span><span class="co">#&gt;  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              </span></span>
@@ -877,39 +976,40 @@ and visualize the multi-omics data.</p>
 <span><span class="co">#&gt; [8] base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt;  [1] scater_1.33.4                   scuttle_1.15.4                 </span></span>
-<span><span class="co">#&gt;  [3] reticulate_1.39.0               patchwork_1.3.0                </span></span>
-<span><span class="co">#&gt;  [5] MOFA2_1.15.0                    miaViz_1.13.15                 </span></span>
-<span><span class="co">#&gt;  [7] ggraph_2.2.1                    ggplot2_3.5.1                  </span></span>
-<span><span class="co">#&gt;  [9] mia_1.13.47                     MGnifyR_1.1.0                  </span></span>
-<span><span class="co">#&gt; [11] HoloFoodR_0.99.11               TreeSummarizedExperiment_2.13.0</span></span>
-<span><span class="co">#&gt; [13] Biostrings_2.73.2               XVector_0.45.0                 </span></span>
-<span><span class="co">#&gt; [15] SingleCellExperiment_1.27.2     MultiAssayExperiment_1.31.5    </span></span>
-<span><span class="co">#&gt; [17] SummarizedExperiment_1.35.4     Biobase_2.65.1                 </span></span>
-<span><span class="co">#&gt; [19] GenomicRanges_1.57.2            GenomeInfoDb_1.41.2            </span></span>
-<span><span class="co">#&gt; [21] IRanges_2.39.2                  S4Vectors_0.43.2               </span></span>
-<span><span class="co">#&gt; [23] BiocGenerics_0.51.3             MatrixGenerics_1.17.0          </span></span>
-<span><span class="co">#&gt; [25] matrixStats_1.4.1               ggsignif_0.6.4                 </span></span>
-<span><span class="co">#&gt; [27] DT_0.33                         dplyr_1.1.4                    </span></span>
-<span><span class="co">#&gt; [29] knitr_1.48                      BiocStyle_2.33.1               </span></span>
+<span><span class="co">#&gt;  [1] shadowtext_0.1.4                scater_1.35.0                  </span></span>
+<span><span class="co">#&gt;  [3] scuttle_1.17.0                  reticulate_1.40.0              </span></span>
+<span><span class="co">#&gt;  [5] patchwork_1.3.0                 MOFA2_1.17.0                   </span></span>
+<span><span class="co">#&gt;  [7] miaViz_1.15.2                   ggraph_2.2.1                   </span></span>
+<span><span class="co">#&gt;  [9] ggplot2_3.5.1                   mia_1.15.6                     </span></span>
+<span><span class="co">#&gt; [11] MGnifyR_1.3.0                   HoloFoodR_1.1.1                </span></span>
+<span><span class="co">#&gt; [13] TreeSummarizedExperiment_2.15.0 Biostrings_2.75.1              </span></span>
+<span><span class="co">#&gt; [15] XVector_0.47.0                  SingleCellExperiment_1.29.1    </span></span>
+<span><span class="co">#&gt; [17] MultiAssayExperiment_1.33.1     SummarizedExperiment_1.37.0    </span></span>
+<span><span class="co">#&gt; [19] Biobase_2.67.0                  GenomicRanges_1.59.1           </span></span>
+<span><span class="co">#&gt; [21] GenomeInfoDb_1.43.1             IRanges_2.41.1                 </span></span>
+<span><span class="co">#&gt; [23] S4Vectors_0.45.2                BiocGenerics_0.53.3            </span></span>
+<span><span class="co">#&gt; [25] generics_0.1.3                  MatrixGenerics_1.19.0          </span></span>
+<span><span class="co">#&gt; [27] matrixStats_1.4.1               ggsignif_0.6.4                 </span></span>
+<span><span class="co">#&gt; [29] DT_0.33                         dplyr_1.1.4                    </span></span>
+<span><span class="co">#&gt; [31] knitr_1.49                      BiocStyle_2.35.0               </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;   [1] splines_4.4.1               filelock_1.0.3             </span></span>
+<span><span class="co">#&gt;   [1] splines_4.5.0               filelock_1.0.3             </span></span>
 <span><span class="co">#&gt;   [3] ggplotify_0.1.2             urltools_1.7.3             </span></span>
 <span><span class="co">#&gt;   [5] tibble_3.2.1                triebeard_0.4.1            </span></span>
-<span><span class="co">#&gt;   [7] polyclip_1.10-7             basilisk.utils_1.17.3      </span></span>
-<span><span class="co">#&gt;   [9] rpart_4.1.23                DirichletMultinomial_1.47.2</span></span>
-<span><span class="co">#&gt;  [11] lifecycle_1.0.4             httr2_1.0.5                </span></span>
+<span><span class="co">#&gt;   [7] polyclip_1.10-7             basilisk.utils_1.19.0      </span></span>
+<span><span class="co">#&gt;   [9] rpart_4.1.23                DirichletMultinomial_1.49.0</span></span>
+<span><span class="co">#&gt;  [11] lifecycle_1.0.4             httr2_1.0.6                </span></span>
 <span><span class="co">#&gt;  [13] lattice_0.22-6              MASS_7.3-61                </span></span>
 <span><span class="co">#&gt;  [15] crosstalk_1.2.1             SnowballC_0.7.1            </span></span>
 <span><span class="co">#&gt;  [17] backports_1.5.0             magrittr_2.0.3             </span></span>
-<span><span class="co">#&gt;  [19] Hmisc_5.1-3                 sass_0.4.9                 </span></span>
-<span><span class="co">#&gt;  [21] rmarkdown_2.28              jquerylib_0.1.4            </span></span>
+<span><span class="co">#&gt;  [19] Hmisc_5.2-0                 sass_0.4.9                 </span></span>
+<span><span class="co">#&gt;  [21] rmarkdown_2.29              jquerylib_0.1.4            </span></span>
 <span><span class="co">#&gt;  [23] yaml_2.3.10                 RColorBrewer_1.1-3         </span></span>
 <span><span class="co">#&gt;  [25] cowplot_1.1.3               DBI_1.2.3                  </span></span>
 <span><span class="co">#&gt;  [27] minqa_1.2.8                 abind_1.4-8                </span></span>
-<span><span class="co">#&gt;  [29] zlibbioc_1.51.2             Rtsne_0.17                 </span></span>
-<span><span class="co">#&gt;  [31] purrr_1.0.2                 yulab.utils_0.1.7          </span></span>
+<span><span class="co">#&gt;  [29] zlibbioc_1.53.0             Rtsne_0.17                 </span></span>
+<span><span class="co">#&gt;  [31] purrr_1.0.2                 yulab.utils_0.1.8          </span></span>
 <span><span class="co">#&gt;  [33] nnet_7.3-19                 tweenr_2.0.3               </span></span>
 <span><span class="co">#&gt;  [35] rappdirs_0.3.3              sandwich_3.1-1             </span></span>
 <span><span class="co">#&gt;  [37] GenomeInfoDbData_1.2.13     ggrepel_0.9.6              </span></span>
@@ -917,65 +1017,65 @@ and visualize the multi-omics data.</p>
 <span><span class="co">#&gt;  [41] tidytree_0.4.6              pheatmap_1.0.12            </span></span>
 <span><span class="co">#&gt;  [43] vegan_2.6-8                 rbiom_1.0.3                </span></span>
 <span><span class="co">#&gt;  [45] tidyjson_0.3.2              pkgdown_2.1.1              </span></span>
-<span><span class="co">#&gt;  [47] permute_0.9-7               DelayedMatrixStats_1.27.3  </span></span>
-<span><span class="co">#&gt;  [49] codetools_0.2-20            DelayedArray_0.31.14       </span></span>
+<span><span class="co">#&gt;  [47] permute_0.9-7               DelayedMatrixStats_1.29.0  </span></span>
+<span><span class="co">#&gt;  [49] codetools_0.2-20            DelayedArray_0.33.2        </span></span>
 <span><span class="co">#&gt;  [51] ggforce_0.4.2               tidyselect_1.2.1           </span></span>
-<span><span class="co">#&gt;  [53] aplot_0.2.3                 UCSC.utils_1.1.0           </span></span>
+<span><span class="co">#&gt;  [53] aplot_0.2.3                 UCSC.utils_1.3.0           </span></span>
 <span><span class="co">#&gt;  [55] farver_2.1.2                lme4_1.1-35.5              </span></span>
-<span><span class="co">#&gt;  [57] ScaledMatrix_1.13.0         viridis_0.6.5              </span></span>
+<span><span class="co">#&gt;  [57] ScaledMatrix_1.15.0         viridis_0.6.5              </span></span>
 <span><span class="co">#&gt;  [59] base64enc_0.1-3             jsonlite_1.8.9             </span></span>
-<span><span class="co">#&gt;  [61] BiocNeighbors_1.99.3        decontam_1.25.0            </span></span>
+<span><span class="co">#&gt;  [61] BiocNeighbors_2.1.0         decontam_1.27.0            </span></span>
 <span><span class="co">#&gt;  [63] tidygraph_1.3.1             Formula_1.2-5              </span></span>
 <span><span class="co">#&gt;  [65] systemfonts_1.1.0           ggnewscale_0.5.0           </span></span>
-<span><span class="co">#&gt;  [67] tools_4.4.1                 treeio_1.29.1              </span></span>
-<span><span class="co">#&gt;  [69] ragg_1.3.3                  Rcpp_1.0.13                </span></span>
-<span><span class="co">#&gt;  [71] glue_1.8.0                  BiocBaseUtils_1.7.3        </span></span>
-<span><span class="co">#&gt;  [73] gridExtra_2.3               SparseArray_1.5.45         </span></span>
-<span><span class="co">#&gt;  [75] xfun_0.48                   mgcv_1.9-1                 </span></span>
-<span><span class="co">#&gt;  [77] HDF5Array_1.33.8            withr_3.0.1                </span></span>
+<span><span class="co">#&gt;  [67] tools_4.5.0                 treeio_1.31.0              </span></span>
+<span><span class="co">#&gt;  [69] ragg_1.3.3                  Rcpp_1.0.13-1              </span></span>
+<span><span class="co">#&gt;  [71] glue_1.8.0                  BiocBaseUtils_1.9.0        </span></span>
+<span><span class="co">#&gt;  [73] gridExtra_2.3               SparseArray_1.7.2          </span></span>
+<span><span class="co">#&gt;  [75] xfun_0.49                   mgcv_1.9-1                 </span></span>
+<span><span class="co">#&gt;  [77] HDF5Array_1.35.1            withr_3.0.2                </span></span>
 <span><span class="co">#&gt;  [79] BiocManager_1.30.25         fastmap_1.2.0              </span></span>
-<span><span class="co">#&gt;  [81] basilisk_1.17.2             rhdf5filters_1.17.0        </span></span>
-<span><span class="co">#&gt;  [83] boot_1.3-31                 bluster_1.15.1             </span></span>
-<span><span class="co">#&gt;  [85] fansi_1.0.6                 digest_0.6.37              </span></span>
-<span><span class="co">#&gt;  [87] rsvd_1.0.5                  gridGraphics_0.5-1         </span></span>
-<span><span class="co">#&gt;  [89] R6_2.5.1                    textshaping_0.4.0          </span></span>
-<span><span class="co">#&gt;  [91] colorspace_2.1-1            lpSolve_5.6.21             </span></span>
-<span><span class="co">#&gt;  [93] UpSetR_1.4.0                utf8_1.2.4                 </span></span>
-<span><span class="co">#&gt;  [95] tidyr_1.3.1                 generics_0.1.3             </span></span>
-<span><span class="co">#&gt;  [97] data.table_1.16.2           DECIPHER_3.1.5             </span></span>
-<span><span class="co">#&gt;  [99] graphlayouts_1.2.0          httr_1.4.7                 </span></span>
-<span><span class="co">#&gt; [101] htmlwidgets_1.6.4           S4Arrays_1.5.11            </span></span>
+<span><span class="co">#&gt;  [81] ggh4x_0.2.8                 basilisk_1.19.0            </span></span>
+<span><span class="co">#&gt;  [83] rhdf5filters_1.19.0         boot_1.3-31                </span></span>
+<span><span class="co">#&gt;  [85] bluster_1.17.0              fansi_1.0.6                </span></span>
+<span><span class="co">#&gt;  [87] digest_0.6.37               rsvd_1.0.5                 </span></span>
+<span><span class="co">#&gt;  [89] gridGraphics_0.5-1          R6_2.5.1                   </span></span>
+<span><span class="co">#&gt;  [91] textshaping_0.4.0           colorspace_2.1-1           </span></span>
+<span><span class="co">#&gt;  [93] lpSolve_5.6.22              UpSetR_1.4.0               </span></span>
+<span><span class="co">#&gt;  [95] utf8_1.2.4                  tidyr_1.3.1                </span></span>
+<span><span class="co">#&gt;  [97] data.table_1.16.2           DECIPHER_3.3.0             </span></span>
+<span><span class="co">#&gt;  [99] graphlayouts_1.2.1          httr_1.4.7                 </span></span>
+<span><span class="co">#&gt; [101] htmlwidgets_1.6.4           S4Arrays_1.7.1             </span></span>
 <span><span class="co">#&gt; [103] uwot_0.2.2                  pkgconfig_2.0.3            </span></span>
-<span><span class="co">#&gt; [105] gtable_0.3.5                janeaustenr_1.0.0          </span></span>
+<span><span class="co">#&gt; [105] gtable_0.3.6                janeaustenr_1.0.0          </span></span>
 <span><span class="co">#&gt; [107] htmltools_0.5.8.1           bookdown_0.41              </span></span>
 <span><span class="co">#&gt; [109] scales_1.3.0                png_0.1-8                  </span></span>
 <span><span class="co">#&gt; [111] corrplot_0.95               ggfun_0.1.7                </span></span>
 <span><span class="co">#&gt; [113] rstudioapi_0.17.1           reshape2_1.4.4             </span></span>
 <span><span class="co">#&gt; [115] checkmate_2.3.2             nlme_3.1-166               </span></span>
-<span><span class="co">#&gt; [117] nloptr_2.1.1                rhdf5_2.49.0               </span></span>
+<span><span class="co">#&gt; [117] nloptr_2.1.1                rhdf5_2.51.0               </span></span>
 <span><span class="co">#&gt; [119] cachem_1.1.0                zoo_1.8-12                 </span></span>
-<span><span class="co">#&gt; [121] stringr_1.5.1               parallel_4.4.1             </span></span>
+<span><span class="co">#&gt; [121] stringr_1.5.1               parallel_4.5.0             </span></span>
 <span><span class="co">#&gt; [123] vipor_0.4.7                 foreign_0.8-87             </span></span>
 <span><span class="co">#&gt; [125] desc_1.4.3                  pillar_1.9.0               </span></span>
-<span><span class="co">#&gt; [127] grid_4.4.1                  vctrs_0.6.5                </span></span>
-<span><span class="co">#&gt; [129] slam_0.1-54                 BiocSingular_1.21.4        </span></span>
-<span><span class="co">#&gt; [131] beachmat_2.21.8             cluster_2.1.6              </span></span>
+<span><span class="co">#&gt; [127] grid_4.5.0                  vctrs_0.6.5                </span></span>
+<span><span class="co">#&gt; [129] slam_0.1-55                 BiocSingular_1.23.0        </span></span>
+<span><span class="co">#&gt; [131] beachmat_2.23.1             cluster_2.1.6              </span></span>
 <span><span class="co">#&gt; [133] beeswarm_0.4.0              htmlTable_2.4.3            </span></span>
-<span><span class="co">#&gt; [135] evaluate_1.0.1              mvtnorm_1.3-1              </span></span>
-<span><span class="co">#&gt; [137] cli_3.6.3                   compiler_4.4.1             </span></span>
+<span><span class="co">#&gt; [135] evaluate_1.0.1              mvtnorm_1.3-2              </span></span>
+<span><span class="co">#&gt; [137] cli_3.6.3                   compiler_4.5.0             </span></span>
 <span><span class="co">#&gt; [139] rlang_1.1.4                 crayon_1.5.3               </span></span>
 <span><span class="co">#&gt; [141] tidytext_0.4.2              labeling_0.4.3             </span></span>
 <span><span class="co">#&gt; [143] forcats_1.0.0               mediation_4.5.0            </span></span>
-<span><span class="co">#&gt; [145] plyr_1.8.9                  fs_1.6.4                   </span></span>
+<span><span class="co">#&gt; [145] plyr_1.8.9                  fs_1.6.5                   </span></span>
 <span><span class="co">#&gt; [147] ggbeeswarm_0.7.2            stringi_1.8.4              </span></span>
-<span><span class="co">#&gt; [149] viridisLite_0.4.2           BiocParallel_1.39.0        </span></span>
+<span><span class="co">#&gt; [149] viridisLite_0.4.2           BiocParallel_1.41.0        </span></span>
 <span><span class="co">#&gt; [151] assertthat_0.2.1            munsell_0.5.1              </span></span>
-<span><span class="co">#&gt; [153] lazyeval_0.2.2              Matrix_1.7-0               </span></span>
-<span><span class="co">#&gt; [155] dir.expiry_1.13.1           sparseMatrixStats_1.17.2   </span></span>
-<span><span class="co">#&gt; [157] Rhdf5lib_1.27.0             highr_0.11                 </span></span>
-<span><span class="co">#&gt; [159] memoise_2.0.1               igraph_2.1.1               </span></span>
-<span><span class="co">#&gt; [161] RcppParallel_5.1.9          bslib_0.8.0                </span></span>
-<span><span class="co">#&gt; [163] ggtree_3.13.1               ape_5.8</span></span></code></pre></div>
+<span><span class="co">#&gt; [153] lazyeval_0.2.2              Matrix_1.7-1               </span></span>
+<span><span class="co">#&gt; [155] dir.expiry_1.15.0           sparseMatrixStats_1.19.0   </span></span>
+<span><span class="co">#&gt; [157] Rhdf5lib_1.29.0             memoise_2.0.1              </span></span>
+<span><span class="co">#&gt; [159] igraph_2.1.1                RcppParallel_5.1.9         </span></span>
+<span><span class="co">#&gt; [161] bslib_0.8.0                 ggtree_3.15.0              </span></span>
+<span><span class="co">#&gt; [163] ape_5.8</span></span></code></pre></div>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-Argelaguet2020" class="csl-entry">
 Argelaguet, Ricard, Damien Arnol, Danila Bredikhin, Yonatan Deloro,
