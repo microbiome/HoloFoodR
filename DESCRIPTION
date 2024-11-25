@@ -55,9 +55,6 @@ Suggests:
     shadowtext,
     testthat,
     UpSetR
-Remotes:
-    github::microbiome/mia,
-    github::microbiome/miaViz
 URL: https://github.com/EBI-Metagenomics/HoloFoodR
 BugReports: https://github.com/EBI-Metagenomics/HoloFoodR/issues
 VignetteBuilder: knitr
