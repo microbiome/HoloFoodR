@@ -831,7 +831,7 @@ p2 <- plotAbundance(
     col.var = c("study_group", "timepoint"),
     facet.cols = TRUE, scales = "free_x"
     ) +
-    labs(y = "Relative abundance")
+    labs(y = "Relative abundance") +
   guides(fill = guide_legend(title = "Genus"))
 
 p1 + p2  + plot_layout(widths = c(1, 2))
