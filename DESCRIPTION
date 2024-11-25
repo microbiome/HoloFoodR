@@ -45,6 +45,8 @@ Suggests:
     ggsignif,
     knitr,
     MGnifyR,
+    mia,
+    miaViz
     MOFA2,
     patchwork,
     reticulate,
